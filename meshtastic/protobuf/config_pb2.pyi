@@ -9,6 +9,7 @@ import google.protobuf.descriptor
 import google.protobuf.internal.containers
 import google.protobuf.internal.enum_type_wrapper
 import google.protobuf.message
+import meshtastic.protobuf.destinations_pb2
 import meshtastic.protobuf.device_ui_pb2
 import sys
 import typing
@@ -781,6 +782,7 @@ class Config(google.protobuf.message.Message):
         IPV4_CONFIG_FIELD_NUMBER: builtins.int
         RSYSLOG_SERVER_FIELD_NUMBER: builtins.int
         ENABLED_PROTOCOLS_FIELD_NUMBER: builtins.int
+        IPV6_ENABLED_FIELD_NUMBER: builtins.int
         wifi_enabled: builtins.bool
         """
         Enable WiFi (disables Bluetooth)
@@ -814,6 +816,10 @@ class Config(google.protobuf.message.Message):
         """
         Flags for enabling/disabling network protocols
         """
+        ipv6_enabled: builtins.bool
+        """
+        Enable/Disable ipv6 support
+        """
         @property
         def ipv4_config(self) -> global___Config.NetworkConfig.IpV4Config:
             """
@@ -832,9 +838,10 @@ class Config(google.protobuf.message.Message):
             ipv4_config: global___Config.NetworkConfig.IpV4Config | None = ...,
             rsyslog_server: builtins.str = ...,
             enabled_protocols: builtins.int = ...,
+            ipv6_enabled: builtins.bool = ...,
         ) -> None: ...
         def HasField(self, field_name: typing.Literal["ipv4_config", b"ipv4_config"]) -> builtins.bool: ...
-        def ClearField(self, field_name: typing.Literal["address_mode", b"address_mode", "enabled_protocols", b"enabled_protocols", "eth_enabled", b"eth_enabled", "ipv4_config", b"ipv4_config", "ntp_server", b"ntp_server", "rsyslog_server", b"rsyslog_server", "wifi_enabled", b"wifi_enabled", "wifi_psk", b"wifi_psk", "wifi_ssid", b"wifi_ssid"]) -> None: ...
+        def ClearField(self, field_name: typing.Literal["address_mode", b"address_mode", "enabled_protocols", b"enabled_protocols", "eth_enabled", b"eth_enabled", "ipv4_config", b"ipv4_config", "ipv6_enabled", b"ipv6_enabled", "ntp_server", b"ntp_server", "rsyslog_server", b"rsyslog_server", "wifi_enabled", b"wifi_enabled", "wifi_psk", b"wifi_psk", "wifi_ssid", b"wifi_ssid"]) -> None: ...
 
     @typing.final
     class DisplayConfig(google.protobuf.message.Message):
@@ -1770,6 +1777,7 @@ class Config(google.protobuf.message.Message):
     SECURITY_FIELD_NUMBER: builtins.int
     SESSIONKEY_FIELD_NUMBER: builtins.int
     DEVICE_UI_FIELD_NUMBER: builtins.int
+    DESTINATIONS_FIELD_NUMBER: builtins.int
     @property
     def device(self) -> global___Config.DeviceConfig: ...
     @property
@@ -1790,6 +1798,8 @@ class Config(google.protobuf.message.Message):
     def sessionkey(self) -> global___Config.SessionkeyConfig: ...
     @property
     def device_ui(self) -> meshtastic.protobuf.device_ui_pb2.DeviceUIConfig: ...
+    @property
+    def destinations(self) -> meshtastic.protobuf.destinations_pb2.DestinationsConfig: ...
     def __init__(
         self,
         *,
@@ -1803,9 +1813,10 @@ class Config(google.protobuf.message.Message):
         security: global___Config.SecurityConfig | None = ...,
         sessionkey: global___Config.SessionkeyConfig | None = ...,
         device_ui: meshtastic.protobuf.device_ui_pb2.DeviceUIConfig | None = ...,
+        destinations: meshtastic.protobuf.destinations_pb2.DestinationsConfig | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["bluetooth", b"bluetooth", "device", b"device", "device_ui", b"device_ui", "display", b"display", "lora", b"lora", "network", b"network", "payload_variant", b"payload_variant", "position", b"position", "power", b"power", "security", b"security", "sessionkey", b"sessionkey"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["bluetooth", b"bluetooth", "device", b"device", "device_ui", b"device_ui", "display", b"display", "lora", b"lora", "network", b"network", "payload_variant", b"payload_variant", "position", b"position", "power", b"power", "security", b"security", "sessionkey", b"sessionkey"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing.Literal["payload_variant", b"payload_variant"]) -> typing.Literal["device", "position", "power", "network", "display", "lora", "bluetooth", "security", "sessionkey", "device_ui"] | None: ...
+    def HasField(self, field_name: typing.Literal["bluetooth", b"bluetooth", "destinations", b"destinations", "device", b"device", "device_ui", b"device_ui", "display", b"display", "lora", b"lora", "network", b"network", "payload_variant", b"payload_variant", "position", b"position", "power", b"power", "security", b"security", "sessionkey", b"sessionkey"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["bluetooth", b"bluetooth", "destinations", b"destinations", "device", b"device", "device_ui", b"device_ui", "display", b"display", "lora", b"lora", "network", b"network", "payload_variant", b"payload_variant", "position", b"position", "power", b"power", "security", b"security", "sessionkey", b"sessionkey"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing.Literal["payload_variant", b"payload_variant"]) -> typing.Literal["device", "position", "power", "network", "display", "lora", "bluetooth", "security", "sessionkey", "device_ui", "destinations"] | None: ...
 
 global___Config = Config

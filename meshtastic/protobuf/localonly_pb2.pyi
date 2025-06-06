@@ -7,6 +7,7 @@ import builtins
 import google.protobuf.descriptor
 import google.protobuf.message
 import meshtastic.protobuf.config_pb2
+import meshtastic.protobuf.destinations_pb2
 import meshtastic.protobuf.module_config_pb2
 import typing
 
@@ -30,6 +31,7 @@ class LocalConfig(google.protobuf.message.Message):
     BLUETOOTH_FIELD_NUMBER: builtins.int
     VERSION_FIELD_NUMBER: builtins.int
     SECURITY_FIELD_NUMBER: builtins.int
+    DESTINATIONS_FIELD_NUMBER: builtins.int
     version: builtins.int
     """
     A version integer used to invalidate old save files when we make
@@ -84,6 +86,12 @@ class LocalConfig(google.protobuf.message.Message):
         The part of the config that is specific to Security settings
         """
 
+    @property
+    def destinations(self) -> meshtastic.protobuf.destinations_pb2.DestinationsConfig:
+        """
+        The part of the config that is specific to Destinations settings
+        """
+
     def __init__(
         self,
         *,
@@ -96,9 +104,10 @@ class LocalConfig(google.protobuf.message.Message):
         bluetooth: meshtastic.protobuf.config_pb2.Config.BluetoothConfig | None = ...,
         version: builtins.int = ...,
         security: meshtastic.protobuf.config_pb2.Config.SecurityConfig | None = ...,
+        destinations: meshtastic.protobuf.destinations_pb2.DestinationsConfig | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["bluetooth", b"bluetooth", "device", b"device", "display", b"display", "lora", b"lora", "network", b"network", "position", b"position", "power", b"power", "security", b"security"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["bluetooth", b"bluetooth", "device", b"device", "display", b"display", "lora", b"lora", "network", b"network", "position", b"position", "power", b"power", "security", b"security", "version", b"version"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["bluetooth", b"bluetooth", "destinations", b"destinations", "device", b"device", "display", b"display", "lora", b"lora", "network", b"network", "position", b"position", "power", b"power", "security", b"security"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["bluetooth", b"bluetooth", "destinations", b"destinations", "device", b"device", "display", b"display", "lora", b"lora", "network", b"network", "position", b"position", "power", b"power", "security", b"security", "version", b"version"]) -> None: ...
 
 global___LocalConfig = LocalConfig
 
