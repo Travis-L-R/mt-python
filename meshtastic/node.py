@@ -715,6 +715,10 @@ class Node:
             self.localConfig.destinations.destinations[idx].first_leap = dest_kwargs['first_leap']
         if 'last_leap' in dest_kwargs:
             self.localConfig.destinations.destinations[idx].last_leap = dest_kwargs['last_leap']
+        if 'modem_preset' in dest_kwargs:
+            self.localConfig.destinations.destinations[idx].lora_switch.modem_preset = dest_kwargs['modem_preset']
+        if 'freq_slot' in dest_kwargs:
+            self.localConfig.destinations.destinations[idx].lora_switch.channel_num = dest_kwargs['freq_slot']
 
         self.beginSettingsTransaction()
         self.writeConfig('destinations')

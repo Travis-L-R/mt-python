@@ -610,6 +610,12 @@ def onConnected(interface):
                 
             if args.dest_first_leap:
                 dest_kwargs['first_leap'] = int(args.dest_first_leap[0][-8:], 16)
+            
+            if args.dest_modem_preset:
+                dest_kwargs['modem_preset'] = int(args.dest_modem_preset[0])
+
+            if args.dest_freq_slot:
+                dest_kwargs['freq_slot'] = int(args.dest_freq_slot[0])
 
             closeNow = True
             waitForAckNak = True
@@ -1701,6 +1707,20 @@ def addDestinationConfigArgs(parser: argparse.ArgumentParser) -> argparse.Argume
         action="store",
     )
     
+    group.add_argument(
+        "--dest-modem-preset",
+        nargs=1,
+        help="Override the modem-preset for a destination",
+        action="store",
+    )
+
+    group.add_argument(
+        "--dest-freq-slot",
+        nargs=1,
+        help="Override the frequency slot for a destination",
+        action="store",
+    )
+
     return parser
 
 def addPositionConfigArgs(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
