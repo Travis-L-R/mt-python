@@ -7,7 +7,7 @@ import time
 
 from typing import Optional, Union, List
 
-from meshtastic.protobuf import admin_pb2, apponly_pb2, channel_pb2, localonly_pb2, mesh_pb2, portnums_pb2
+from meshtastic.protobuf import admin_pb2, apponly_pb2, channel_pb2, destinations_pb2, localonly_pb2, mesh_pb2, portnums_pb2
 from meshtastic.util import (
     Timeout,
     camel_to_snake,
@@ -697,6 +697,39 @@ class Node:
         else:
             onResponse = self.onAckNak
         return self._sendAdmin(p, onResponse=onResponse)
+    
+     
+    def setDestination(self, dest_kwargs: dict):
+        """Tell the node to set a custome config for the specified destination"""
+        self.ensureSessionKey()
+        
+        idx = dest_kwargs.get('index', None)
+        
+        # if no index is supplied, see if we can find a match for the supplied target node_id
+        if idx is None:
+            assert('node_id' in dest_kwargs)
+            for i, d in enumerate(self.localConfig.destinations.destinations):
+                if d.node_id == dest_kwargs['node_id']:
+                    idx = i
+                    break
+                
+        if idx is None:
+            raise Exception("Could not find destination matching node id, and no index was specified")
+        
+        while len(self.localConfig.destinations.destinations) <= idx:
+            self.localConfig.destinations.destinations.append(destinations_pb2.MeshDestination())
+
+        if 'node_id' in dest_kwargs:
+            self.localConfig.destinations.destinations[idx].node_id = dest_kwargs['node_id']
+        if 'hop_limit' in dest_kwargs:
+            self.localConfig.destinations.destinations[idx].hop_limit = dest_kwargs['hop_limit']
+        if 'next_hop' in dest_kwargs:
+            self.localConfig.destinations.destinations[idx].next_hop = dest_kwargs['next_hop']
+
+        self.beginSettingsTransaction()
+        self.writeConfig('destinations')
+        return self.commitSettingsTransaction()
+  
 
     def setFavorite(self, nodeId: Union[int, str]):
         """Tell the node to set the specified node ID to be favorited on the NodeDB on the device"""

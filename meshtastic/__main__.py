@@ -588,6 +588,26 @@ def onConnected(interface):
                     while True:
                         rhc.watchGPIOs(args.dest, bitmask)
                         time.sleep(1)
+        
+        if (args.dest_target is not None or args.index is not None) and \
+            (args.dest_hop_limit or args.dest_next_hop):
+            dest_kwargs = {}
+            
+            if args.index:
+                dest_kwargs['index'] = args.index[0]
+            
+            if args.dest_target:
+                dest_kwargs['node_id'] = int(args.dest_target[0][-8:], 16)
+
+            if args.dest_hop_limit:
+                dest_kwargs['hop_limit'] = args.dest_hop_limit[0]
+                
+            if args.dest_next_hop:
+                dest_kwargs['next_hop'] = int(args.dest_next_hop[0][-2:], 16)
+                
+            closeNow = True
+            waitForAckNak = True
+            interface.getNode(args.dest, False, **getNode_kwargs).setDestination(dest_kwargs)
 
         # handle settings
         if args.set:
@@ -1623,6 +1643,46 @@ def addChannelConfigArgs(parser: argparse.ArgumentParser) -> argparse.ArgumentPa
 
     return parser
 
+def addDestinationConfigArgs(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
+    """Add arguments to do with manually specified destinations"""
+
+    group = parser.add_argument_group(
+        "Destinations Configuration",
+        "Arguments that set overrides and special configs for selected destinations.",
+    )
+    
+    group.add_argument(
+        "--index",
+        nargs=1,
+        help="Selects which slot should be modified when adding or setting a destination config",
+        action="store",
+        type=int
+    )
+    
+    group.add_argument(
+        "--dest-target",
+        nargs=1,
+        help="The target node id (e.g. '!abcdef01') to for this destination config",
+        action="store",
+    )
+    
+    group.add_argument(
+        "--dest-hop-limit",
+        nargs=1,
+        help="Number of hops to set for a destination",
+        action="store",
+        type=int,
+    )
+    
+    group.add_argument(
+        "--dest-next-hop",
+        nargs=1,
+        help="Preprogram a next-hop to a destination (for static nodes and routes only)",
+        action="store",
+    )
+    
+    return parser
+
 def addPositionConfigArgs(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
     """Add arguments to do with fixed positions and position config"""
 
@@ -1875,6 +1935,7 @@ def initParser():
     parser = addConfigArgs(parser)
     parser = addPositionConfigArgs(parser)
     parser = addChannelConfigArgs(parser)
+    parser = addDestinationConfigArgs(parser)
 
     # Arguments for sending or requesting things from the local device
     parser = addLocalActionArgs(parser)
