@@ -183,6 +183,8 @@ class Node:
             ('display', 'localConfig'),
             ('lora', 'localConfig'),
             ('bluetooth', 'localConfig'),
+            ('security', 'localConfig'),
+            ('destinations', 'localConfig'),
 
             ('mqtt', 'moduleConfig'),
             ('serial', 'moduleConfig'),
