@@ -199,7 +199,7 @@ class Node:
             ('detection_sensor', 'moduleConfig'),
             ('ambient_lighting', 'moduleConfig'),
             ('paxcounter', 'moduleConfig'),
-                                          ): 
+            ): 
             if config_name == field_name:
                 config_found = True
                 config = config or getattr(self, source_config)
