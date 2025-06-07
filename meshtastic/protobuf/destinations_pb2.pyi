@@ -8,6 +8,7 @@ import collections.abc
 import google.protobuf.descriptor
 import google.protobuf.internal.containers
 import google.protobuf.message
+import meshtastic.protobuf.lora_config_pb2
 import typing
 
 DESCRIPTOR: google.protobuf.descriptor.FileDescriptor
@@ -23,6 +24,9 @@ class DestinationsConfig(google.protobuf.message.Message):
         NUM_FIELD_NUMBER: builtins.int
         HOP_LIMIT_FIELD_NUMBER: builtins.int
         NEXT_HOP_FIELD_NUMBER: builtins.int
+        FIRST_LEAP_FIELD_NUMBER: builtins.int
+        LAST_LEAP_FIELD_NUMBER: builtins.int
+        LORA_SWITCH_FIELD_NUMBER: builtins.int
         num: builtins.int
         """
         The node number for this destination
@@ -35,17 +39,43 @@ class DestinationsConfig(google.protobuf.message.Message):
         """
         Manual next hop specification for messages to this node (zero represents default)
         """
+        first_leap: builtins.int
+        """
+        Node number of first desired leap node toward this destination (optional).
+        At least one of first_leap or last_leap should be set to a valid node number
+        if leaping is desired.
+        """
+        last_leap: builtins.int
+        """
+        Node number of last desired leap node toward this destination (optional).
+        This should ordinarily be the closest reliable node to the destination.
+        """
+        @property
+        def lora_switch(self) -> meshtastic.protobuf.lora_config_pb2.LoRaConfigLite:
+            """
+            LoRa modem settings to switch out temporarily for messages sent to this destination.
+            """
+
         def __init__(
             self,
             *,
             num: builtins.int = ...,
             hop_limit: builtins.int | None = ...,
             next_hop: builtins.int | None = ...,
+            first_leap: builtins.int | None = ...,
+            last_leap: builtins.int | None = ...,
+            lora_switch: meshtastic.protobuf.lora_config_pb2.LoRaConfigLite | None = ...,
         ) -> None: ...
-        def HasField(self, field_name: typing.Literal["_hop_limit", b"_hop_limit", "_next_hop", b"_next_hop", "hop_limit", b"hop_limit", "next_hop", b"next_hop"]) -> builtins.bool: ...
-        def ClearField(self, field_name: typing.Literal["_hop_limit", b"_hop_limit", "_next_hop", b"_next_hop", "hop_limit", b"hop_limit", "next_hop", b"next_hop", "num", b"num"]) -> None: ...
+        def HasField(self, field_name: typing.Literal["_first_leap", b"_first_leap", "_hop_limit", b"_hop_limit", "_last_leap", b"_last_leap", "_lora_switch", b"_lora_switch", "_next_hop", b"_next_hop", "first_leap", b"first_leap", "hop_limit", b"hop_limit", "last_leap", b"last_leap", "lora_switch", b"lora_switch", "next_hop", b"next_hop"]) -> builtins.bool: ...
+        def ClearField(self, field_name: typing.Literal["_first_leap", b"_first_leap", "_hop_limit", b"_hop_limit", "_last_leap", b"_last_leap", "_lora_switch", b"_lora_switch", "_next_hop", b"_next_hop", "first_leap", b"first_leap", "hop_limit", b"hop_limit", "last_leap", b"last_leap", "lora_switch", b"lora_switch", "next_hop", b"next_hop", "num", b"num"]) -> None: ...
+        @typing.overload
+        def WhichOneof(self, oneof_group: typing.Literal["_first_leap", b"_first_leap"]) -> typing.Literal["first_leap"] | None: ...
         @typing.overload
         def WhichOneof(self, oneof_group: typing.Literal["_hop_limit", b"_hop_limit"]) -> typing.Literal["hop_limit"] | None: ...
+        @typing.overload
+        def WhichOneof(self, oneof_group: typing.Literal["_last_leap", b"_last_leap"]) -> typing.Literal["last_leap"] | None: ...
+        @typing.overload
+        def WhichOneof(self, oneof_group: typing.Literal["_lora_switch", b"_lora_switch"]) -> typing.Literal["lora_switch"] | None: ...
         @typing.overload
         def WhichOneof(self, oneof_group: typing.Literal["_next_hop", b"_next_hop"]) -> typing.Literal["next_hop"] | None: ...
 
@@ -54,6 +84,9 @@ class DestinationsConfig(google.protobuf.message.Message):
     TELEMETRY_DEST_FIELD_NUMBER: builtins.int
     POSITION_DEST_FIELD_NUMBER: builtins.int
     DESTINATIONS_FIELD_NUMBER: builtins.int
+    LEAPS_ENABLED_FIELD_NUMBER: builtins.int
+    LEAP_CHANNEL_FIELD_NUMBER: builtins.int
+    LORA_SWITCH_ENABLED_FIELD_NUMBER: builtins.int
     default_dest: builtins.int
     """
     Optional default destination for most types of packets that would otherwise be sent to broadcast.
@@ -70,6 +103,19 @@ class DestinationsConfig(google.protobuf.message.Message):
     """
     Optional destination for position messages. Defaults to default_dest (or if none, broadcast).
     """
+    leaps_enabled: builtins.bool
+    """
+    Whether to use leaping or not.
+    """
+    leap_channel: builtins.int
+    """
+    Can be used to specify a dedicated channel to send leap messages on. Intended for backwards compatbility with leap-naive nodes.
+    The leap channel should accordingly not use the default AQ== PSK.
+    """
+    lora_switch_enabled: builtins.bool
+    """
+    Whether to allow LoRa channel switching for destinations
+    """
     @property
     def destinations(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___DestinationsConfig.MeshDestination]:
         """
@@ -84,7 +130,10 @@ class DestinationsConfig(google.protobuf.message.Message):
         telemetry_dest: builtins.int = ...,
         position_dest: builtins.int = ...,
         destinations: collections.abc.Iterable[global___DestinationsConfig.MeshDestination] | None = ...,
+        leaps_enabled: builtins.bool = ...,
+        leap_channel: builtins.int = ...,
+        lora_switch_enabled: builtins.bool = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing.Literal["default_dest", b"default_dest", "destinations", b"destinations", "nodeinfo_dest", b"nodeinfo_dest", "position_dest", b"position_dest", "telemetry_dest", b"telemetry_dest"]) -> None: ...
+    def ClearField(self, field_name: typing.Literal["default_dest", b"default_dest", "destinations", b"destinations", "leap_channel", b"leap_channel", "leaps_enabled", b"leaps_enabled", "lora_switch_enabled", b"lora_switch_enabled", "nodeinfo_dest", b"nodeinfo_dest", "position_dest", b"position_dest", "telemetry_dest", b"telemetry_dest"]) -> None: ...
 
 global___DestinationsConfig = DestinationsConfig

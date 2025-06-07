@@ -9,7 +9,7 @@ import google.protobuf.descriptor
 import google.protobuf.internal.containers
 import google.protobuf.message
 import meshtastic.protobuf.channel_pb2
-import meshtastic.protobuf.config_pb2
+import meshtastic.protobuf.lora_config_pb2
 import typing
 
 DESCRIPTOR: google.protobuf.descriptor.FileDescriptor
@@ -35,7 +35,7 @@ class ChannelSet(google.protobuf.message.Message):
         """
 
     @property
-    def lora_config(self) -> meshtastic.protobuf.config_pb2.Config.LoRaConfig:
+    def lora_config(self) -> meshtastic.protobuf.lora_config_pb2.LoRaConfig:
         """
         LoRa config
         """
@@ -44,7 +44,7 @@ class ChannelSet(google.protobuf.message.Message):
         self,
         *,
         settings: collections.abc.Iterable[meshtastic.protobuf.channel_pb2.ChannelSettings] | None = ...,
-        lora_config: meshtastic.protobuf.config_pb2.Config.LoRaConfig | None = ...,
+        lora_config: meshtastic.protobuf.lora_config_pb2.LoRaConfig | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing.Literal["lora_config", b"lora_config"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["lora_config", b"lora_config", "settings", b"settings"]) -> None: ...

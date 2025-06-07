@@ -7,6 +7,7 @@ import builtins
 import google.protobuf.descriptor
 import google.protobuf.message
 import meshtastic.protobuf.config_pb2
+import meshtastic.protobuf.lora_config_pb2
 import meshtastic.protobuf.mesh_pb2
 import typing
 
@@ -94,11 +95,11 @@ class MapReport(google.protobuf.message.Message):
     """
     Device firmware version string
     """
-    region: meshtastic.protobuf.config_pb2.Config.LoRaConfig.RegionCode.ValueType
+    region: meshtastic.protobuf.lora_config_pb2.LoRaConfig.RegionCode.ValueType
     """
     The region code for the radio (US, CN, EU433, etc...)
     """
-    modem_preset: meshtastic.protobuf.config_pb2.Config.LoRaConfig.ModemPreset.ValueType
+    modem_preset: meshtastic.protobuf.lora_config_pb2.LoRaConfig.ModemPreset.ValueType
     """
     Modem preset used by the radio (LongFast, MediumSlow, etc...)
     """
@@ -140,8 +141,8 @@ class MapReport(google.protobuf.message.Message):
         role: meshtastic.protobuf.config_pb2.Config.DeviceConfig.Role.ValueType = ...,
         hw_model: meshtastic.protobuf.mesh_pb2.HardwareModel.ValueType = ...,
         firmware_version: builtins.str = ...,
-        region: meshtastic.protobuf.config_pb2.Config.LoRaConfig.RegionCode.ValueType = ...,
-        modem_preset: meshtastic.protobuf.config_pb2.Config.LoRaConfig.ModemPreset.ValueType = ...,
+        region: meshtastic.protobuf.lora_config_pb2.LoRaConfig.RegionCode.ValueType = ...,
+        modem_preset: meshtastic.protobuf.lora_config_pb2.LoRaConfig.ModemPreset.ValueType = ...,
         has_default_channel: builtins.bool = ...,
         latitude_i: builtins.int = ...,
         longitude_i: builtins.int = ...,

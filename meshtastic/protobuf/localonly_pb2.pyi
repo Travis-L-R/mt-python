@@ -8,6 +8,7 @@ import google.protobuf.descriptor
 import google.protobuf.message
 import meshtastic.protobuf.config_pb2
 import meshtastic.protobuf.destinations_pb2
+import meshtastic.protobuf.lora_config_pb2
 import meshtastic.protobuf.module_config_pb2
 import typing
 
@@ -69,7 +70,7 @@ class LocalConfig(google.protobuf.message.Message):
         """
 
     @property
-    def lora(self) -> meshtastic.protobuf.config_pb2.Config.LoRaConfig:
+    def lora(self) -> meshtastic.protobuf.lora_config_pb2.LoRaConfig:
         """
         The part of the config that is specific to the Lora Radio
         """
@@ -100,7 +101,7 @@ class LocalConfig(google.protobuf.message.Message):
         power: meshtastic.protobuf.config_pb2.Config.PowerConfig | None = ...,
         network: meshtastic.protobuf.config_pb2.Config.NetworkConfig | None = ...,
         display: meshtastic.protobuf.config_pb2.Config.DisplayConfig | None = ...,
-        lora: meshtastic.protobuf.config_pb2.Config.LoRaConfig | None = ...,
+        lora: meshtastic.protobuf.lora_config_pb2.LoRaConfig | None = ...,
         bluetooth: meshtastic.protobuf.config_pb2.Config.BluetoothConfig | None = ...,
         version: builtins.int = ...,
         security: meshtastic.protobuf.config_pb2.Config.SecurityConfig | None = ...,
