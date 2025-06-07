@@ -1882,6 +1882,7 @@ class Data(google.protobuf.message.Message):
     REPLY_ID_FIELD_NUMBER: builtins.int
     EMOJI_FIELD_NUMBER: builtins.int
     BITFIELD_FIELD_NUMBER: builtins.int
+    LEAP_DATA_FIELD_NUMBER: builtins.int
     portnum: meshtastic.protobuf.portnums_pb2.PortNum.ValueType
     """
     Formerly named typ and of type Type
@@ -1928,6 +1929,12 @@ class Data(google.protobuf.message.Message):
     """
     Bitfield for extra flags. First use is to indicate that user approves the packet being uploaded to MQTT.
     """
+    @property
+    def leap_data(self) -> global___LeapData:
+        """
+        Path data for packets sent using leap destinations.
+        """
+
     def __init__(
         self,
         *,
@@ -1940,10 +1947,14 @@ class Data(google.protobuf.message.Message):
         reply_id: builtins.int = ...,
         emoji: builtins.int = ...,
         bitfield: builtins.int | None = ...,
+        leap_data: global___LeapData | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["_bitfield", b"_bitfield", "bitfield", b"bitfield"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["_bitfield", b"_bitfield", "bitfield", b"bitfield", "dest", b"dest", "emoji", b"emoji", "payload", b"payload", "portnum", b"portnum", "reply_id", b"reply_id", "request_id", b"request_id", "source", b"source", "want_response", b"want_response"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["_bitfield", b"_bitfield", "_leap_data", b"_leap_data", "bitfield", b"bitfield", "leap_data", b"leap_data"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["_bitfield", b"_bitfield", "_leap_data", b"_leap_data", "bitfield", b"bitfield", "dest", b"dest", "emoji", b"emoji", "leap_data", b"leap_data", "payload", b"payload", "portnum", b"portnum", "reply_id", b"reply_id", "request_id", b"request_id", "source", b"source", "want_response", b"want_response"]) -> None: ...
+    @typing.overload
     def WhichOneof(self, oneof_group: typing.Literal["_bitfield", b"_bitfield"]) -> typing.Literal["bitfield"] | None: ...
+    @typing.overload
+    def WhichOneof(self, oneof_group: typing.Literal["_leap_data", b"_leap_data"]) -> typing.Literal["leap_data"] | None: ...
 
 global___Data = Data
 
@@ -3465,3 +3476,53 @@ class ChunkedPayloadResponse(google.protobuf.message.Message):
     def WhichOneof(self, oneof_group: typing.Literal["payload_variant", b"payload_variant"]) -> typing.Literal["request_transfer", "accept_transfer", "resend_chunks"] | None: ...
 
 global___ChunkedPayloadResponse = ChunkedPayloadResponse
+
+@typing.final
+class LeapData(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    FINAL_DEST_FIELD_NUMBER: builtins.int
+    LEAP_MASK_FIELD_NUMBER: builtins.int
+    FIRST_LEAP_FIELD_NUMBER: builtins.int
+    LAST_LEAP_FIELD_NUMBER: builtins.int
+    PRIOR_HOPS_FIELD_NUMBER: builtins.int
+    final_dest: builtins.int
+    """
+    The node number of the true "to" address that we are trying to send a packet to via leaps.
+    """
+    leap_mask: builtins.int
+    """
+    The node number of each traversed leap mask is bitwise-OR'd together, and then used as mask to prevent loops.
+    """
+    first_leap: builtins.int
+    """
+    The node number of the first leap node that has been traversed on the way to final_dest (if any). (So that a return path can be identified.)
+    """
+    last_leap: builtins.int
+    """
+    The node number of the last leap node (if any is known) that we might be trying to get to before final_dest. 
+    Can be set by the "from" node or another leap node along the way.
+    """
+    prior_hops: builtins.int
+    """
+    Stores a count of how many hops occured in earlier legs of the leap path.
+    """
+    def __init__(
+        self,
+        *,
+        final_dest: builtins.int = ...,
+        leap_mask: builtins.int = ...,
+        first_leap: builtins.int | None = ...,
+        last_leap: builtins.int | None = ...,
+        prior_hops: builtins.int | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["_first_leap", b"_first_leap", "_last_leap", b"_last_leap", "_prior_hops", b"_prior_hops", "first_leap", b"first_leap", "last_leap", b"last_leap", "prior_hops", b"prior_hops"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["_first_leap", b"_first_leap", "_last_leap", b"_last_leap", "_prior_hops", b"_prior_hops", "final_dest", b"final_dest", "first_leap", b"first_leap", "last_leap", b"last_leap", "leap_mask", b"leap_mask", "prior_hops", b"prior_hops"]) -> None: ...
+    @typing.overload
+    def WhichOneof(self, oneof_group: typing.Literal["_first_leap", b"_first_leap"]) -> typing.Literal["first_leap"] | None: ...
+    @typing.overload
+    def WhichOneof(self, oneof_group: typing.Literal["_last_leap", b"_last_leap"]) -> typing.Literal["last_leap"] | None: ...
+    @typing.overload
+    def WhichOneof(self, oneof_group: typing.Literal["_prior_hops", b"_prior_hops"]) -> typing.Literal["prior_hops"] | None: ...
+
+global___LeapData = LeapData
