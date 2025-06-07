@@ -605,6 +605,12 @@ def onConnected(interface):
             if args.dest_next_hop:
                 dest_kwargs['next_hop'] = int(args.dest_next_hop[0][-2:], 16)
                 
+            if args.dest_last_leap:
+                dest_kwargs['last_leap'] = int(args.dest_last_leap[0][-8:], 16)
+                
+            if args.dest_first_leap:
+                dest_kwargs['first_leap'] = int(args.dest_first_leap[0][-8:], 16)
+
             closeNow = True
             waitForAckNak = True
             interface.getNode(args.dest, False, **getNode_kwargs).setDestination(dest_kwargs)
@@ -1678,6 +1684,20 @@ def addDestinationConfigArgs(parser: argparse.ArgumentParser) -> argparse.Argume
         "--dest-next-hop",
         nargs=1,
         help="Preprogram a next-hop to a destination (for static nodes and routes only)",
+        action="store",
+    )
+
+    group.add_argument(
+        "--dest-last-leap",
+        nargs=1,
+        help="Set the node for the last leap before the target destination",
+        action="store",
+    )
+    
+    group.add_argument(
+        "--dest-first-leap",
+        nargs=1,
+        help="Set the node for the first leap on the way to the destination",
         action="store",
     )
     

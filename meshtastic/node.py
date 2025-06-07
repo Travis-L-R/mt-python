@@ -711,6 +711,10 @@ class Node:
             self.localConfig.destinations.destinations[idx].hop_limit = dest_kwargs['hop_limit']
         if 'next_hop' in dest_kwargs:
             self.localConfig.destinations.destinations[idx].next_hop = dest_kwargs['next_hop']
+        if 'first_leap' in dest_kwargs:
+            self.localConfig.destinations.destinations[idx].first_leap = dest_kwargs['first_leap']
+        if 'last_leap' in dest_kwargs:
+            self.localConfig.destinations.destinations[idx].last_leap = dest_kwargs['last_leap']
 
         self.beginSettingsTransaction()
         self.writeConfig('destinations')
