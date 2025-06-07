@@ -172,57 +172,43 @@ class Node:
             our_exit("Error: No localConfig has been read")
 
         p = admin_pb2.AdminMessage()
+        
+        config_found = False
 
-        if config_name == "device":
-            p.set_config.device.CopyFrom(self.localConfig.device)
-        elif config_name == "position":
-            p.set_config.position.CopyFrom(self.localConfig.position)
-        elif config_name == "power":
-            p.set_config.power.CopyFrom(self.localConfig.power)
-        elif config_name == "network":
-            p.set_config.network.CopyFrom(self.localConfig.network)
-        elif config_name == "display":
-            p.set_config.display.CopyFrom(self.localConfig.display)
-        elif config_name == "lora":
-            p.set_config.lora.CopyFrom(self.localConfig.lora)
-        elif config_name == "bluetooth":
-            p.set_config.bluetooth.CopyFrom(self.localConfig.bluetooth)
-        elif config_name == "security":
-            p.set_config.security.CopyFrom(self.localConfig.security)
-        elif config_name == "mqtt":
-            p.set_module_config.mqtt.CopyFrom(self.moduleConfig.mqtt)
-        elif config_name == "serial":
-            p.set_module_config.serial.CopyFrom(self.moduleConfig.serial)
-        elif config_name == "external_notification":
-            p.set_module_config.external_notification.CopyFrom(
-                self.moduleConfig.external_notification
-            )
-        elif config_name == "store_forward":
-            p.set_module_config.store_forward.CopyFrom(self.moduleConfig.store_forward)
-        elif config_name == "range_test":
-            p.set_module_config.range_test.CopyFrom(self.moduleConfig.range_test)
-        elif config_name == "telemetry":
-            p.set_module_config.telemetry.CopyFrom(self.moduleConfig.telemetry)
-        elif config_name == "canned_message":
-            p.set_module_config.canned_message.CopyFrom(
-                self.moduleConfig.canned_message
-            )
-        elif config_name == "audio":
-            p.set_module_config.audio.CopyFrom(self.moduleConfig.audio)
-        elif config_name == "remote_hardware":
-            p.set_module_config.remote_hardware.CopyFrom(
-                self.moduleConfig.remote_hardware
-            )
-        elif config_name == "neighbor_info":
-            p.set_module_config.neighbor_info.CopyFrom(self.moduleConfig.neighbor_info)
-        elif config_name == "detection_sensor":
-            p.set_module_config.detection_sensor.CopyFrom(self.moduleConfig.detection_sensor)
-        elif config_name == "ambient_lighting":
-            p.set_module_config.ambient_lighting.CopyFrom(self.moduleConfig.ambient_lighting)
-        elif config_name == "paxcounter":
-            p.set_module_config.paxcounter.CopyFrom(self.moduleConfig.paxcounter)
-        else:
-            our_exit(f"Error: No valid config with name {config_name}")
+        for field_name, source_config in (
+            ('device', 'localConfig'),
+            ('position', 'localConfig'),
+            ('power', 'localConfig'),
+            ('network', 'localConfig'),
+            ('display', 'localConfig'),
+            ('lora', 'localConfig'),
+            ('bluetooth', 'localConfig'),
+            ('security', 'localConfig'),
+            ('destinations', 'localConfig'),
+
+            ('mqtt', 'moduleConfig'),
+            ('serial', 'moduleConfig'),
+            ('external_notification', 'moduleConfig'),
+            ('store_forward', 'moduleConfig'),
+            ('range_test', 'moduleConfig'),
+            ('telemetry', 'moduleConfig'),
+            ('canned_message', 'moduleConfig'),
+            ('audio', 'moduleConfig'),
+            ('remote_hardware', 'moduleConfig'),
+            ('neighbor_info', 'moduleConfig'),
+            ('detection_sensor', 'moduleConfig'),
+            ('ambient_lighting', 'moduleConfig'),
+            ('paxcounter', 'moduleConfig'),
+                                          ): 
+            if config_name == field_name:
+                config_found = True
+                config = config or getattr(self, source_config)
+                set_config_obj = getattr(p.set_config, field_name)
+                set_config_obj.CopyFrom(getattr(config, field_name))
+                break
+
+            if not config_found:
+                our_exit(f"Error: No valid config with name {config_name}")
 
         logging.debug(f"Wrote: {config_name}")
         if self == self.iface.localNode:
