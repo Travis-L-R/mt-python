@@ -202,8 +202,8 @@ class Node:
             ): 
             if config_name == field_name:
                 config_found = True
-                config = config or getattr(self, source_config)
-                set_config_obj = getattr(p.set_config, field_name)
+                config = getattr(self, source_config)
+                set_config_obj = getattr(p.set_config if source_config == 'localConfig' else p.set_module_config, field_name) 
                 set_config_obj.CopyFrom(getattr(config, field_name))
                 break
 
