@@ -207,8 +207,8 @@ class Node:
                 set_config_obj.CopyFrom(getattr(config, field_name))
                 break
 
-            if not config_found:
-                our_exit(f"Error: No valid config with name {config_name}")
+        if not config_found:
+            our_exit(f"Error: No valid config with name {config_name}")
 
         logging.debug(f"Wrote: {config_name}")
         if self == self.iface.localNode:
