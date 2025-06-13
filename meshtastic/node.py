@@ -706,7 +706,7 @@ class Node:
             self.localConfig.destinations.destinations.append(destinations_pb2.DestinationsConfig.MeshDestination())
 
         if 'node_id' in dest_kwargs:
-            self.localConfig.destinations.destinations[idx].node_id = dest_kwargs['node_id']
+            self.localConfig.destinations.destinations[idx].num = dest_kwargs['node_id']
         if 'hop_limit' in dest_kwargs:
             self.localConfig.destinations.destinations[idx].hop_limit = dest_kwargs['hop_limit']
         if 'next_hop' in dest_kwargs:
