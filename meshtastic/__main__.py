@@ -593,6 +593,8 @@ def onConnected(interface):
             (args.index is not None and (\
                 args.dest_hop_limit is not None\
                 or args.dest_next_hop is not None\
+                or args.dest_last_leap is not None\
+                or args.dest_first_leap is not None\
             )):
             dest_kwargs = {}
             
