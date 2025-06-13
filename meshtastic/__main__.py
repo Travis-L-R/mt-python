@@ -595,6 +595,8 @@ def onConnected(interface):
                 or args.dest_next_hop is not None\
                 or args.dest_last_leap is not None\
                 or args.dest_first_leap is not None\
+                or args.dest_modem_preset is not None\
+                or args.dest_freq_slot is not None\
             )):
             dest_kwargs = {}
             
