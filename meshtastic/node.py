@@ -703,7 +703,7 @@ class Node:
             raise Exception("Could not find destination matching node id, and no index was specified")
         
         while len(self.localConfig.destinations.destinations) <= idx:
-            self.localConfig.destinations.destinations.append(destinations_pb2.MeshDestination())
+            self.localConfig.destinations.destinations.append(destinations_pb2.DestinationsConfig.MeshDestination())
 
         if 'node_id' in dest_kwargs:
             self.localConfig.destinations.destinations[idx].node_id = dest_kwargs['node_id']

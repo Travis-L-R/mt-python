@@ -78,7 +78,7 @@ def fromStr(valstr: str) -> Any:
     Args:
         valstr (string): A user provided string
     """
-    val: Any
+    val: Any = None
     if len(valstr) == 0:  # Treat an emptystring as an empty bytes
         val = bytes()
     elif valstr.startswith("0x"):
@@ -90,7 +90,13 @@ def fromStr(valstr: str) -> Any:
         val = True
     elif valstr.lower() in {"f", "false", "no"}:
         val = False
-    else:
+    elif valstr[0] == '!' and len(valstr) == 9:
+        try:
+            val = int(valstr[-8:], 16)
+        except ValueError:
+            val = None
+
+    if val is None:
         try:
             val = int(valstr)
         except ValueError:
