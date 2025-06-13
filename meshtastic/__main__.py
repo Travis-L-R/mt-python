@@ -589,8 +589,13 @@ def onConnected(interface):
                         rhc.watchGPIOs(args.dest, bitmask)
                         time.sleep(1)
         
-        if (args.dest_target is not None or args.index is not None) and \
-            (args.dest_hop_limit or args.dest_next_hop):
+        if args.dest_target is not None or \
+            (args.index is not None and (\
+                args.dest_hop_limit is not None\
+                or args.dest_next_hop is not None\
+                or args.dest_last_leap is not None\
+                or args.dest_first_leap is not None\
+            )):
             dest_kwargs = {}
             
             if args.index:
