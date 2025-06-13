@@ -590,9 +590,10 @@ def onConnected(interface):
                         time.sleep(1)
         
         if args.dest_target is not None or \
-            (args.index is not None and \
-             (args.dest_hop_limit or args.dest_next_hop)\
-            ):
+            (args.index is not None and (\
+                args.dest_hop_limit is not None\
+                or args.dest_next_hop is not None\
+            )):
             dest_kwargs = {}
             
             if args.index:
