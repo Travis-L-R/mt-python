@@ -465,6 +465,10 @@ class _HardwareModelEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._
     """*
     Lilygo TLora Pager
     """
+    GAT562_MESH_TRIAL_TRACKER: _HardwareModel.ValueType  # 104
+    """*
+    GAT562 Mesh Trial Tracker
+    """
     PRIVATE_HW: _HardwareModel.ValueType  # 255
     """
     ------------------------------------------------------------------------------------------------------------------------------------------
@@ -912,6 +916,10 @@ Lilygo T-Deck Pro
 T_LORA_PAGER: HardwareModel.ValueType  # 103
 """*
 Lilygo TLora Pager
+"""
+GAT562_MESH_TRIAL_TRACKER: HardwareModel.ValueType  # 104
+"""*
+GAT562 Mesh Trial Tracker
 """
 PRIVATE_HW: HardwareModel.ValueType  # 255
 """
@@ -2925,6 +2933,8 @@ class ClientNotification(google.protobuf.message.Message):
     KEY_VERIFICATION_NUMBER_INFORM_FIELD_NUMBER: builtins.int
     KEY_VERIFICATION_NUMBER_REQUEST_FIELD_NUMBER: builtins.int
     KEY_VERIFICATION_FINAL_FIELD_NUMBER: builtins.int
+    DUPLICATED_PUBLIC_KEY_FIELD_NUMBER: builtins.int
+    LOW_ENTROPY_KEY_FIELD_NUMBER: builtins.int
     reply_id: builtins.int
     """
     The id of the packet we're notifying in response to
@@ -2947,6 +2957,10 @@ class ClientNotification(google.protobuf.message.Message):
     def key_verification_number_request(self) -> global___KeyVerificationNumberRequest: ...
     @property
     def key_verification_final(self) -> global___KeyVerificationFinal: ...
+    @property
+    def duplicated_public_key(self) -> global___DuplicatedPublicKey: ...
+    @property
+    def low_entropy_key(self) -> global___LowEntropyKey: ...
     def __init__(
         self,
         *,
@@ -2957,13 +2971,15 @@ class ClientNotification(google.protobuf.message.Message):
         key_verification_number_inform: global___KeyVerificationNumberInform | None = ...,
         key_verification_number_request: global___KeyVerificationNumberRequest | None = ...,
         key_verification_final: global___KeyVerificationFinal | None = ...,
+        duplicated_public_key: global___DuplicatedPublicKey | None = ...,
+        low_entropy_key: global___LowEntropyKey | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["_reply_id", b"_reply_id", "key_verification_final", b"key_verification_final", "key_verification_number_inform", b"key_verification_number_inform", "key_verification_number_request", b"key_verification_number_request", "payload_variant", b"payload_variant", "reply_id", b"reply_id"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["_reply_id", b"_reply_id", "key_verification_final", b"key_verification_final", "key_verification_number_inform", b"key_verification_number_inform", "key_verification_number_request", b"key_verification_number_request", "level", b"level", "message", b"message", "payload_variant", b"payload_variant", "reply_id", b"reply_id", "time", b"time"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["_reply_id", b"_reply_id", "duplicated_public_key", b"duplicated_public_key", "key_verification_final", b"key_verification_final", "key_verification_number_inform", b"key_verification_number_inform", "key_verification_number_request", b"key_verification_number_request", "low_entropy_key", b"low_entropy_key", "payload_variant", b"payload_variant", "reply_id", b"reply_id"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["_reply_id", b"_reply_id", "duplicated_public_key", b"duplicated_public_key", "key_verification_final", b"key_verification_final", "key_verification_number_inform", b"key_verification_number_inform", "key_verification_number_request", b"key_verification_number_request", "level", b"level", "low_entropy_key", b"low_entropy_key", "message", b"message", "payload_variant", b"payload_variant", "reply_id", b"reply_id", "time", b"time"]) -> None: ...
     @typing.overload
     def WhichOneof(self, oneof_group: typing.Literal["_reply_id", b"_reply_id"]) -> typing.Literal["reply_id"] | None: ...
     @typing.overload
-    def WhichOneof(self, oneof_group: typing.Literal["payload_variant", b"payload_variant"]) -> typing.Literal["key_verification_number_inform", "key_verification_number_request", "key_verification_final"] | None: ...
+    def WhichOneof(self, oneof_group: typing.Literal["payload_variant", b"payload_variant"]) -> typing.Literal["key_verification_number_inform", "key_verification_number_request", "key_verification_final", "duplicated_public_key", "low_entropy_key"] | None: ...
 
 global___ClientNotification = ClientNotification
 
@@ -3029,6 +3045,26 @@ class KeyVerificationFinal(google.protobuf.message.Message):
     def ClearField(self, field_name: typing.Literal["isSender", b"isSender", "nonce", b"nonce", "remote_longname", b"remote_longname", "verification_characters", b"verification_characters"]) -> None: ...
 
 global___KeyVerificationFinal = KeyVerificationFinal
+
+@typing.final
+class DuplicatedPublicKey(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    def __init__(
+        self,
+    ) -> None: ...
+
+global___DuplicatedPublicKey = DuplicatedPublicKey
+
+@typing.final
+class LowEntropyKey(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    def __init__(
+        self,
+    ) -> None: ...
+
+global___LowEntropyKey = LowEntropyKey
 
 @typing.final
 class FileInfo(google.protobuf.message.Message):

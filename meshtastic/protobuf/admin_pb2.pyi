@@ -278,6 +278,44 @@ class AdminMessage(google.protobuf.message.Message):
     Backup to the SD card
     """
 
+    @typing.final
+    class InputEvent(google.protobuf.message.Message):
+        """
+        Input event message to be sent to the node.
+        """
+
+        DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+        EVENT_CODE_FIELD_NUMBER: builtins.int
+        KB_CHAR_FIELD_NUMBER: builtins.int
+        TOUCH_X_FIELD_NUMBER: builtins.int
+        TOUCH_Y_FIELD_NUMBER: builtins.int
+        event_code: builtins.int
+        """
+        The input event code
+        """
+        kb_char: builtins.int
+        """
+        Keyboard character code
+        """
+        touch_x: builtins.int
+        """
+        The touch X coordinate
+        """
+        touch_y: builtins.int
+        """
+        The touch Y coordinate
+        """
+        def __init__(
+            self,
+            *,
+            event_code: builtins.int = ...,
+            kb_char: builtins.int = ...,
+            touch_x: builtins.int = ...,
+            touch_y: builtins.int = ...,
+        ) -> None: ...
+        def ClearField(self, field_name: typing.Literal["event_code", b"event_code", "kb_char", b"kb_char", "touch_x", b"touch_x", "touch_y", b"touch_y"]) -> None: ...
+
     SESSION_PASSKEY_FIELD_NUMBER: builtins.int
     GET_CHANNEL_REQUEST_FIELD_NUMBER: builtins.int
     GET_CHANNEL_RESPONSE_FIELD_NUMBER: builtins.int
@@ -304,6 +342,7 @@ class AdminMessage(google.protobuf.message.Message):
     BACKUP_PREFERENCES_FIELD_NUMBER: builtins.int
     RESTORE_PREFERENCES_FIELD_NUMBER: builtins.int
     REMOVE_BACKUP_PREFERENCES_FIELD_NUMBER: builtins.int
+    SEND_INPUT_EVENT_FIELD_NUMBER: builtins.int
     SET_OWNER_FIELD_NUMBER: builtins.int
     SET_CHANNEL_FIELD_NUMBER: builtins.int
     SET_CONFIG_FIELD_NUMBER: builtins.int
@@ -537,6 +576,13 @@ class AdminMessage(google.protobuf.message.Message):
         """
 
     @property
+    def send_input_event(self) -> global___AdminMessage.InputEvent:
+        """
+        Send an input event to the node.
+        This is used to trigger physical input events like button presses, touch events, etc.
+        """
+
+    @property
     def set_owner(self) -> meshtastic.protobuf.mesh_pb2.User:
         """
         Set the owner for this node
@@ -623,6 +669,7 @@ class AdminMessage(google.protobuf.message.Message):
         backup_preferences: global___AdminMessage.BackupLocation.ValueType = ...,
         restore_preferences: global___AdminMessage.BackupLocation.ValueType = ...,
         remove_backup_preferences: global___AdminMessage.BackupLocation.ValueType = ...,
+        send_input_event: global___AdminMessage.InputEvent | None = ...,
         set_owner: meshtastic.protobuf.mesh_pb2.User | None = ...,
         set_channel: meshtastic.protobuf.channel_pb2.Channel | None = ...,
         set_config: meshtastic.protobuf.config_pb2.Config | None = ...,
@@ -652,9 +699,9 @@ class AdminMessage(google.protobuf.message.Message):
         factory_reset_config: builtins.int = ...,
         nodedb_reset: builtins.int = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["add_contact", b"add_contact", "backup_preferences", b"backup_preferences", "begin_edit_settings", b"begin_edit_settings", "commit_edit_settings", b"commit_edit_settings", "delete_file_request", b"delete_file_request", "enter_dfu_mode_request", b"enter_dfu_mode_request", "exit_simulator", b"exit_simulator", "factory_reset_config", b"factory_reset_config", "factory_reset_device", b"factory_reset_device", "get_canned_message_module_messages_request", b"get_canned_message_module_messages_request", "get_canned_message_module_messages_response", b"get_canned_message_module_messages_response", "get_channel_request", b"get_channel_request", "get_channel_response", b"get_channel_response", "get_config_request", b"get_config_request", "get_config_response", b"get_config_response", "get_device_connection_status_request", b"get_device_connection_status_request", "get_device_connection_status_response", b"get_device_connection_status_response", "get_device_metadata_request", b"get_device_metadata_request", "get_device_metadata_response", b"get_device_metadata_response", "get_module_config_request", b"get_module_config_request", "get_module_config_response", b"get_module_config_response", "get_node_remote_hardware_pins_request", b"get_node_remote_hardware_pins_request", "get_node_remote_hardware_pins_response", b"get_node_remote_hardware_pins_response", "get_owner_request", b"get_owner_request", "get_owner_response", b"get_owner_response", "get_ringtone_request", b"get_ringtone_request", "get_ringtone_response", b"get_ringtone_response", "get_ui_config_request", b"get_ui_config_request", "get_ui_config_response", b"get_ui_config_response", "key_verification", b"key_verification", "nodedb_reset", b"nodedb_reset", "payload_variant", b"payload_variant", "reboot_ota_seconds", b"reboot_ota_seconds", "reboot_seconds", b"reboot_seconds", "remove_backup_preferences", b"remove_backup_preferences", "remove_by_nodenum", b"remove_by_nodenum", "remove_favorite_node", b"remove_favorite_node", "remove_fixed_position", b"remove_fixed_position", "remove_ignored_node", b"remove_ignored_node", "restore_preferences", b"restore_preferences", "set_canned_message_module_messages", b"set_canned_message_module_messages", "set_channel", b"set_channel", "set_config", b"set_config", "set_favorite_node", b"set_favorite_node", "set_fixed_position", b"set_fixed_position", "set_ham_mode", b"set_ham_mode", "set_ignored_node", b"set_ignored_node", "set_module_config", b"set_module_config", "set_owner", b"set_owner", "set_ringtone_message", b"set_ringtone_message", "set_scale", b"set_scale", "set_time_only", b"set_time_only", "shutdown_seconds", b"shutdown_seconds", "store_ui_config", b"store_ui_config"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["add_contact", b"add_contact", "backup_preferences", b"backup_preferences", "begin_edit_settings", b"begin_edit_settings", "commit_edit_settings", b"commit_edit_settings", "delete_file_request", b"delete_file_request", "enter_dfu_mode_request", b"enter_dfu_mode_request", "exit_simulator", b"exit_simulator", "factory_reset_config", b"factory_reset_config", "factory_reset_device", b"factory_reset_device", "get_canned_message_module_messages_request", b"get_canned_message_module_messages_request", "get_canned_message_module_messages_response", b"get_canned_message_module_messages_response", "get_channel_request", b"get_channel_request", "get_channel_response", b"get_channel_response", "get_config_request", b"get_config_request", "get_config_response", b"get_config_response", "get_device_connection_status_request", b"get_device_connection_status_request", "get_device_connection_status_response", b"get_device_connection_status_response", "get_device_metadata_request", b"get_device_metadata_request", "get_device_metadata_response", b"get_device_metadata_response", "get_module_config_request", b"get_module_config_request", "get_module_config_response", b"get_module_config_response", "get_node_remote_hardware_pins_request", b"get_node_remote_hardware_pins_request", "get_node_remote_hardware_pins_response", b"get_node_remote_hardware_pins_response", "get_owner_request", b"get_owner_request", "get_owner_response", b"get_owner_response", "get_ringtone_request", b"get_ringtone_request", "get_ringtone_response", b"get_ringtone_response", "get_ui_config_request", b"get_ui_config_request", "get_ui_config_response", b"get_ui_config_response", "key_verification", b"key_verification", "nodedb_reset", b"nodedb_reset", "payload_variant", b"payload_variant", "reboot_ota_seconds", b"reboot_ota_seconds", "reboot_seconds", b"reboot_seconds", "remove_backup_preferences", b"remove_backup_preferences", "remove_by_nodenum", b"remove_by_nodenum", "remove_favorite_node", b"remove_favorite_node", "remove_fixed_position", b"remove_fixed_position", "remove_ignored_node", b"remove_ignored_node", "restore_preferences", b"restore_preferences", "session_passkey", b"session_passkey", "set_canned_message_module_messages", b"set_canned_message_module_messages", "set_channel", b"set_channel", "set_config", b"set_config", "set_favorite_node", b"set_favorite_node", "set_fixed_position", b"set_fixed_position", "set_ham_mode", b"set_ham_mode", "set_ignored_node", b"set_ignored_node", "set_module_config", b"set_module_config", "set_owner", b"set_owner", "set_ringtone_message", b"set_ringtone_message", "set_scale", b"set_scale", "set_time_only", b"set_time_only", "shutdown_seconds", b"shutdown_seconds", "store_ui_config", b"store_ui_config"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing.Literal["payload_variant", b"payload_variant"]) -> typing.Literal["get_channel_request", "get_channel_response", "get_owner_request", "get_owner_response", "get_config_request", "get_config_response", "get_module_config_request", "get_module_config_response", "get_canned_message_module_messages_request", "get_canned_message_module_messages_response", "get_device_metadata_request", "get_device_metadata_response", "get_ringtone_request", "get_ringtone_response", "get_device_connection_status_request", "get_device_connection_status_response", "set_ham_mode", "get_node_remote_hardware_pins_request", "get_node_remote_hardware_pins_response", "enter_dfu_mode_request", "delete_file_request", "set_scale", "backup_preferences", "restore_preferences", "remove_backup_preferences", "set_owner", "set_channel", "set_config", "set_module_config", "set_canned_message_module_messages", "set_ringtone_message", "remove_by_nodenum", "set_favorite_node", "remove_favorite_node", "set_fixed_position", "remove_fixed_position", "set_time_only", "get_ui_config_request", "get_ui_config_response", "store_ui_config", "set_ignored_node", "remove_ignored_node", "begin_edit_settings", "commit_edit_settings", "add_contact", "key_verification", "factory_reset_device", "reboot_ota_seconds", "exit_simulator", "reboot_seconds", "shutdown_seconds", "factory_reset_config", "nodedb_reset"] | None: ...
+    def HasField(self, field_name: typing.Literal["add_contact", b"add_contact", "backup_preferences", b"backup_preferences", "begin_edit_settings", b"begin_edit_settings", "commit_edit_settings", b"commit_edit_settings", "delete_file_request", b"delete_file_request", "enter_dfu_mode_request", b"enter_dfu_mode_request", "exit_simulator", b"exit_simulator", "factory_reset_config", b"factory_reset_config", "factory_reset_device", b"factory_reset_device", "get_canned_message_module_messages_request", b"get_canned_message_module_messages_request", "get_canned_message_module_messages_response", b"get_canned_message_module_messages_response", "get_channel_request", b"get_channel_request", "get_channel_response", b"get_channel_response", "get_config_request", b"get_config_request", "get_config_response", b"get_config_response", "get_device_connection_status_request", b"get_device_connection_status_request", "get_device_connection_status_response", b"get_device_connection_status_response", "get_device_metadata_request", b"get_device_metadata_request", "get_device_metadata_response", b"get_device_metadata_response", "get_module_config_request", b"get_module_config_request", "get_module_config_response", b"get_module_config_response", "get_node_remote_hardware_pins_request", b"get_node_remote_hardware_pins_request", "get_node_remote_hardware_pins_response", b"get_node_remote_hardware_pins_response", "get_owner_request", b"get_owner_request", "get_owner_response", b"get_owner_response", "get_ringtone_request", b"get_ringtone_request", "get_ringtone_response", b"get_ringtone_response", "get_ui_config_request", b"get_ui_config_request", "get_ui_config_response", b"get_ui_config_response", "key_verification", b"key_verification", "nodedb_reset", b"nodedb_reset", "payload_variant", b"payload_variant", "reboot_ota_seconds", b"reboot_ota_seconds", "reboot_seconds", b"reboot_seconds", "remove_backup_preferences", b"remove_backup_preferences", "remove_by_nodenum", b"remove_by_nodenum", "remove_favorite_node", b"remove_favorite_node", "remove_fixed_position", b"remove_fixed_position", "remove_ignored_node", b"remove_ignored_node", "restore_preferences", b"restore_preferences", "send_input_event", b"send_input_event", "set_canned_message_module_messages", b"set_canned_message_module_messages", "set_channel", b"set_channel", "set_config", b"set_config", "set_favorite_node", b"set_favorite_node", "set_fixed_position", b"set_fixed_position", "set_ham_mode", b"set_ham_mode", "set_ignored_node", b"set_ignored_node", "set_module_config", b"set_module_config", "set_owner", b"set_owner", "set_ringtone_message", b"set_ringtone_message", "set_scale", b"set_scale", "set_time_only", b"set_time_only", "shutdown_seconds", b"shutdown_seconds", "store_ui_config", b"store_ui_config"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["add_contact", b"add_contact", "backup_preferences", b"backup_preferences", "begin_edit_settings", b"begin_edit_settings", "commit_edit_settings", b"commit_edit_settings", "delete_file_request", b"delete_file_request", "enter_dfu_mode_request", b"enter_dfu_mode_request", "exit_simulator", b"exit_simulator", "factory_reset_config", b"factory_reset_config", "factory_reset_device", b"factory_reset_device", "get_canned_message_module_messages_request", b"get_canned_message_module_messages_request", "get_canned_message_module_messages_response", b"get_canned_message_module_messages_response", "get_channel_request", b"get_channel_request", "get_channel_response", b"get_channel_response", "get_config_request", b"get_config_request", "get_config_response", b"get_config_response", "get_device_connection_status_request", b"get_device_connection_status_request", "get_device_connection_status_response", b"get_device_connection_status_response", "get_device_metadata_request", b"get_device_metadata_request", "get_device_metadata_response", b"get_device_metadata_response", "get_module_config_request", b"get_module_config_request", "get_module_config_response", b"get_module_config_response", "get_node_remote_hardware_pins_request", b"get_node_remote_hardware_pins_request", "get_node_remote_hardware_pins_response", b"get_node_remote_hardware_pins_response", "get_owner_request", b"get_owner_request", "get_owner_response", b"get_owner_response", "get_ringtone_request", b"get_ringtone_request", "get_ringtone_response", b"get_ringtone_response", "get_ui_config_request", b"get_ui_config_request", "get_ui_config_response", b"get_ui_config_response", "key_verification", b"key_verification", "nodedb_reset", b"nodedb_reset", "payload_variant", b"payload_variant", "reboot_ota_seconds", b"reboot_ota_seconds", "reboot_seconds", b"reboot_seconds", "remove_backup_preferences", b"remove_backup_preferences", "remove_by_nodenum", b"remove_by_nodenum", "remove_favorite_node", b"remove_favorite_node", "remove_fixed_position", b"remove_fixed_position", "remove_ignored_node", b"remove_ignored_node", "restore_preferences", b"restore_preferences", "send_input_event", b"send_input_event", "session_passkey", b"session_passkey", "set_canned_message_module_messages", b"set_canned_message_module_messages", "set_channel", b"set_channel", "set_config", b"set_config", "set_favorite_node", b"set_favorite_node", "set_fixed_position", b"set_fixed_position", "set_ham_mode", b"set_ham_mode", "set_ignored_node", b"set_ignored_node", "set_module_config", b"set_module_config", "set_owner", b"set_owner", "set_ringtone_message", b"set_ringtone_message", "set_scale", b"set_scale", "set_time_only", b"set_time_only", "shutdown_seconds", b"shutdown_seconds", "store_ui_config", b"store_ui_config"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing.Literal["payload_variant", b"payload_variant"]) -> typing.Literal["get_channel_request", "get_channel_response", "get_owner_request", "get_owner_response", "get_config_request", "get_config_response", "get_module_config_request", "get_module_config_response", "get_canned_message_module_messages_request", "get_canned_message_module_messages_response", "get_device_metadata_request", "get_device_metadata_response", "get_ringtone_request", "get_ringtone_response", "get_device_connection_status_request", "get_device_connection_status_response", "set_ham_mode", "get_node_remote_hardware_pins_request", "get_node_remote_hardware_pins_response", "enter_dfu_mode_request", "delete_file_request", "set_scale", "backup_preferences", "restore_preferences", "remove_backup_preferences", "send_input_event", "set_owner", "set_channel", "set_config", "set_module_config", "set_canned_message_module_messages", "set_ringtone_message", "remove_by_nodenum", "set_favorite_node", "remove_favorite_node", "set_fixed_position", "remove_fixed_position", "set_time_only", "get_ui_config_request", "get_ui_config_response", "store_ui_config", "set_ignored_node", "remove_ignored_node", "begin_edit_settings", "commit_edit_settings", "add_contact", "key_verification", "factory_reset_device", "reboot_ota_seconds", "exit_simulator", "reboot_seconds", "shutdown_seconds", "factory_reset_config", "nodedb_reset"] | None: ...
 
 global___AdminMessage = AdminMessage
 
@@ -730,9 +777,14 @@ class SharedContact(google.protobuf.message.Message):
 
     NODE_NUM_FIELD_NUMBER: builtins.int
     USER_FIELD_NUMBER: builtins.int
+    SHOULD_IGNORE_FIELD_NUMBER: builtins.int
     node_num: builtins.int
     """
     The node number of the contact
+    """
+    should_ignore: builtins.bool
+    """
+    Add this contact to the blocked / ignored list
     """
     @property
     def user(self) -> meshtastic.protobuf.mesh_pb2.User:
@@ -745,9 +797,10 @@ class SharedContact(google.protobuf.message.Message):
         *,
         node_num: builtins.int = ...,
         user: meshtastic.protobuf.mesh_pb2.User | None = ...,
+        should_ignore: builtins.bool = ...,
     ) -> None: ...
     def HasField(self, field_name: typing.Literal["user", b"user"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["node_num", b"node_num", "user", b"user"]) -> None: ...
+    def ClearField(self, field_name: typing.Literal["node_num", b"node_num", "should_ignore", b"should_ignore", "user", b"user"]) -> None: ...
 
 global___SharedContact = SharedContact
 

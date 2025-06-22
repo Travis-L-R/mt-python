@@ -87,6 +87,8 @@ class DestinationsConfig(google.protobuf.message.Message):
     LEAPS_ENABLED_FIELD_NUMBER: builtins.int
     LEAP_CHANNEL_FIELD_NUMBER: builtins.int
     LORA_SWITCH_ENABLED_FIELD_NUMBER: builtins.int
+    ONLY_LORA_SWITCH_FROM_US_FIELD_NUMBER: builtins.int
+    ONLY_LEAP_SWITCH_MESSAGES_FIELD_NUMBER: builtins.int
     default_dest: builtins.int
     """
     Optional default destination for most types of packets that would otherwise be sent to broadcast.
@@ -116,6 +118,16 @@ class DestinationsConfig(google.protobuf.message.Message):
     """
     Whether to allow LoRa channel switching for destinations
     """
+    only_lora_switch_from_us: builtins.bool
+    """
+    Whether to restrict LoRa channel switching to packets from us (not both acting as intermediate leap node and switching) 
+    so that leaps can be enabled for others without also switch radio settings for others.
+    """
+    only_leap_switch_messages: builtins.bool
+    """
+    Whether to restrict leaping with LoRa radio setting changes to messages.
+    Only works if only_lora_switch_from_us is not set and the message is decodable.
+    """
     @property
     def destinations(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___DestinationsConfig.MeshDestination]:
         """
@@ -133,7 +145,9 @@ class DestinationsConfig(google.protobuf.message.Message):
         leaps_enabled: builtins.bool = ...,
         leap_channel: builtins.int = ...,
         lora_switch_enabled: builtins.bool = ...,
+        only_lora_switch_from_us: builtins.bool = ...,
+        only_leap_switch_messages: builtins.bool = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing.Literal["default_dest", b"default_dest", "destinations", b"destinations", "leap_channel", b"leap_channel", "leaps_enabled", b"leaps_enabled", "lora_switch_enabled", b"lora_switch_enabled", "nodeinfo_dest", b"nodeinfo_dest", "position_dest", b"position_dest", "telemetry_dest", b"telemetry_dest"]) -> None: ...
+    def ClearField(self, field_name: typing.Literal["default_dest", b"default_dest", "destinations", b"destinations", "leap_channel", b"leap_channel", "leaps_enabled", b"leaps_enabled", "lora_switch_enabled", b"lora_switch_enabled", "nodeinfo_dest", b"nodeinfo_dest", "only_leap_switch_messages", b"only_leap_switch_messages", "only_lora_switch_from_us", b"only_lora_switch_from_us", "position_dest", b"position_dest", "telemetry_dest", b"telemetry_dest"]) -> None: ...
 
 global___DestinationsConfig = DestinationsConfig
