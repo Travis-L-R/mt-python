@@ -125,6 +125,14 @@ class LoRaConfig(google.protobuf.message.Message):
         """
         Australia / New Zealand 433MHz
         """
+        KZ_433: LoRaConfig._RegionCode.ValueType  # 23
+        """
+        Kazakhstan 433MHz
+        """
+        KZ_863: LoRaConfig._RegionCode.ValueType  # 24
+        """
+        Kazakhstan 863MHz
+        """
 
     class RegionCode(_RegionCode, metaclass=_RegionCodeEnumTypeWrapper): ...
     UNSET: LoRaConfig.RegionCode.ValueType  # 0
@@ -218,6 +226,14 @@ class LoRaConfig(google.protobuf.message.Message):
     ANZ_433: LoRaConfig.RegionCode.ValueType  # 22
     """
     Australia / New Zealand 433MHz
+    """
+    KZ_433: LoRaConfig.RegionCode.ValueType  # 23
+    """
+    Kazakhstan 433MHz
+    """
+    KZ_863: LoRaConfig.RegionCode.ValueType  # 24
+    """
+    Kazakhstan 863MHz
     """
 
     class _ModemPreset:

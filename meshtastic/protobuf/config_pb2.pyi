@@ -301,6 +301,12 @@ class Config(google.protobuf.message.Message):
             Non-notification system buzzer tones only.
             Buzzer is enabled only for non-notification tones such as button presses, startup, shutdown, but not for alerts.
             """
+            DIRECT_MSG_ONLY: Config.DeviceConfig._BuzzerMode.ValueType  # 4
+            """
+            Direct Message notifications only.
+            Buzzer is enabled only for direct messages and alerts, but not for button presses.
+            External notification config determines the specifics of the notification behavior.
+            """
 
         class BuzzerMode(_BuzzerMode, metaclass=_BuzzerModeEnumTypeWrapper):
             """
@@ -327,6 +333,12 @@ class Config(google.protobuf.message.Message):
         """
         Non-notification system buzzer tones only.
         Buzzer is enabled only for non-notification tones such as button presses, startup, shutdown, but not for alerts.
+        """
+        DIRECT_MSG_ONLY: Config.DeviceConfig.BuzzerMode.ValueType  # 4
+        """
+        Direct Message notifications only.
+        Buzzer is enabled only for direct messages and alerts, but not for button presses.
+        External notification config determines the specifics of the notification behavior.
         """
 
         ROLE_FIELD_NUMBER: builtins.int
