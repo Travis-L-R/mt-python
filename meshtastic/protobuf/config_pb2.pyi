@@ -118,6 +118,11 @@ class Config(google.protobuf.message.Message):
                but should not be given priority over other routers in order to avoid unnecessaraily
                consuming hops.
             """
+            CLIENT_LATE: Config.DeviceConfig._Role.ValueType  # 12
+            """
+            Description: Device that will wait until other nodes should have rebroadcast, and only rebroadcast if no one else has and channel utilization is low)
+            Technical Details: Intended for use when a node wouldn't normally be able to contribute helpfully to the mesh, but you still want it to be able to.
+            """
 
         class Role(_Role, metaclass=_RoleEnumTypeWrapper):
             """
@@ -201,6 +206,11 @@ class Config(google.protobuf.message.Message):
            in areas not already covered by other routers, or to bridge around problematic terrain,
            but should not be given priority over other routers in order to avoid unnecessaraily
            consuming hops.
+        """
+        CLIENT_LATE: Config.DeviceConfig.Role.ValueType  # 12
+        """
+        Description: Device that will wait until other nodes should have rebroadcast, and only rebroadcast if no one else has and channel utilization is low)
+        Technical Details: Intended for use when a node wouldn't normally be able to contribute helpfully to the mesh, but you still want it to be able to.
         """
 
         class _RebroadcastMode:
@@ -1216,6 +1226,7 @@ class Config(google.protobuf.message.Message):
         """
         gps_format: global___Config.DisplayConfig.GpsCoordinateFormat.ValueType
         """
+        Deprecated in 2.7.4: Unused
         How the GPS coordinates are formatted on the OLED screen.
         """
         auto_screen_carousel_secs: builtins.int

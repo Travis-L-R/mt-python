@@ -133,6 +133,14 @@ class LoRaConfig(google.protobuf.message.Message):
         """
         Kazakhstan 863MHz
         """
+        NP_865: LoRaConfig._RegionCode.ValueType  # 25
+        """
+        Nepal 865MHz
+        """
+        BR_902: LoRaConfig._RegionCode.ValueType  # 26
+        """
+        Brazil 902MHz
+        """
 
     class RegionCode(_RegionCode, metaclass=_RegionCodeEnumTypeWrapper): ...
     UNSET: LoRaConfig.RegionCode.ValueType  # 0
@@ -234,6 +242,14 @@ class LoRaConfig(google.protobuf.message.Message):
     KZ_863: LoRaConfig.RegionCode.ValueType  # 24
     """
     Kazakhstan 863MHz
+    """
+    NP_865: LoRaConfig.RegionCode.ValueType  # 25
+    """
+    Nepal 865MHz
+    """
+    BR_902: LoRaConfig.RegionCode.ValueType  # 26
+    """
+    Brazil 902MHz
     """
 
     class _ModemPreset:
