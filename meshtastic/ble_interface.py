@@ -274,6 +274,7 @@ class BLEClient:
             target=self._run_event_loop, name="BLEClient", daemon=True
         )
         self._eventThread.start()
+        self.address = address
 
         if not address and not device:
             logging.debug("No address/device provided - only discover method will work.")
