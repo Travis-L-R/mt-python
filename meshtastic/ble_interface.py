@@ -142,6 +142,20 @@ class BLEInterface(MeshInterface):
     def find_device(self, address: Optional[str]) -> BLEDevice:
         """Find a device by address."""
 
+        if address:
+            with BLEClient() as client:
+                search_start = time.monotonic()
+                logging.info(f"Attempting connection to BLE device {address} without scan (5s timeout)")
+
+                device = client.find_device_by_filter(
+                    filterfunc=lambda d, ad: (ad.local_name == address or d.address.lower() == address),
+                    timeout=5, return_adv=True, service_uuids=[SERVICE_UUID]
+                )
+                search_end = time.monotonic()
+                print(f"Search took {search_end-search_start}")
+                if device:
+                    return device
+
         addressed_devices = BLEInterface.scan()
 
         if address:
@@ -174,7 +188,7 @@ class BLEInterface(MeshInterface):
 
         # Bleak docs recommend always doing a scan before connecting (even if we know addr)
         device = self.find_device(address)
-        client = BLEClient(device.address, disconnected_callback=lambda _: self.close())
+        client = BLEClient(device, disconnected_callback=lambda _: self.close())
         client.connect()
         client.discover()
         return client
@@ -255,21 +269,24 @@ class BLEInterface(MeshInterface):
 class BLEClient:
     """Client for managing connection to a BLE device"""
 
-    def __init__(self, address=None, **kwargs) -> None:
+    def __init__(self, address=None, device=None, **kwargs) -> None:
         self._eventLoop = asyncio.new_event_loop()
         self._eventThread = Thread(
             target=self._run_event_loop, name="BLEClient", daemon=True
         )
         self._eventThread.start()
 
-        if not address:
-            logging.debug("No address provided - only discover method will work.")
+        if not address and not device:
+            logging.debug("No address/device provided - only discover method will work.")
             return
 
-        self.bleak_client = BleakClient(address, **kwargs)
+        self.bleak_client = BleakClient(device if device else address, **kwargs)
 
     def discover(self, **kwargs):  # pylint: disable=C0116
         return self.async_await(BleakScanner.discover(**kwargs))
+
+    def find_device_by_filter(self, **kwargs):  # pylint: disable=C0116
+        return self.async_await(BleakScanner.find_device_by_filter(**kwargs))
 
     def pair(self, **kwargs):  # pylint: disable=C0116
         return self.async_await(self.bleak_client.pair(**kwargs))
