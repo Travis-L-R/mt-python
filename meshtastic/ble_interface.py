@@ -144,15 +144,13 @@ class BLEInterface(MeshInterface):
 
         if address:
             with BLEClient() as client:
-                search_start = time.monotonic()
                 logging.info(f"Attempting connection to BLE device {address} without scan (5s timeout)")
 
                 device = client.find_device_by_filter(
                     filterfunc=lambda d, ad: (ad.local_name == address or d.address.lower() == address),
                     timeout=5, return_adv=True, service_uuids=[SERVICE_UUID]
                 )
-                search_end = time.monotonic()
-                print(f"Search took {search_end-search_start}")
+
                 if device:
                     return device
 
