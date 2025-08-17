@@ -125,6 +125,7 @@ class BLEInterface(MeshInterface):
         """Scan for available BLE devices."""
         with BLEClient() as client:
             logging.info("Scanning for BLE devices (takes 10 seconds)...")
+
             response = client.discover(
                 timeout=10, return_adv=True, service_uuids=[SERVICE_UUID]
             )
@@ -293,7 +294,7 @@ class BLEClient:
         return self.async_await(self.bleak_client.connect(**kwargs))
 
     def disconnect(self, **kwargs):  # pylint: disable=C0116
-        self.async_await(self.bleak_client.disconnect(**kwargs))
+        self.async_await(self.bleak_client.disconnect(**kwargs), timeout=10)
 
     def read_gatt_char(self, *args, **kwargs):  # pylint: disable=C0116
         return self.async_await(self.bleak_client.read_gatt_char(*args, **kwargs))
@@ -306,11 +307,14 @@ class BLEClient:
         return bool(self.bleak_client.services.get_characteristic(specifier))
 
     def start_notify(self, *args, **kwargs):  # pylint: disable=C0116
-        self.async_await(self.bleak_client.start_notify(*args, **kwargs))
+        self.async_await(self.bleak_client.start_notify(*args, **kwargs), timeout=30)
 
     def close(self):  # pylint: disable=C0116
         self.async_run(self._stop_event_loop())
-        self._eventThread.join()
+        try:
+            self._eventThread.join(timeout=30.0)
+        except RuntimeError:
+            pass
 
     def __enter__(self):
         return self
@@ -319,7 +323,12 @@ class BLEClient:
         self.close()
 
     def async_await(self, coro, timeout=None):  # pylint: disable=C0116
-        return self.async_run(coro).result(timeout)
+        try:
+            return self.async_run(coro).result(timeout)
+        except TimeoutError:
+            return None
+        except Exception as e:
+            print(f"Exception during BLEClient async call: {type(e)}: {e}")
 
     def async_run(self, coro):  # pylint: disable=C0116
         return asyncio.run_coroutine_threadsafe(coro, self._eventLoop)
