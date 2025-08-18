@@ -200,9 +200,21 @@ class BLEInterface(MeshInterface):
             device = None
             if address:
                 try: 
-                    from subprocess import call
+                    from subprocess import call, check_output
                     logging.info(f"Disconnecting from {address}, in case still connected via OS")
-                    call(["bluetoothctl", "disconnect", address])
+                    mac_address = address if len(address) == 7 and address[2] == ":" else None
+
+                    if mac_address is None:
+                        device_strings = check_output(["bluetoothctl", "devices"]).decode().split("\n")
+                        for d_string in device_strings:
+                            if d_string.endswith(address):
+                                mac_address = d_string.split(" ")[-2]
+                                break
+
+                    if mac_address:
+                        call(["bluetoothctl", "disconnect", mac_address])
+                    else:
+                        logging.warning("Couldn't find desired address in list of known devices")
                 except Exception as e:
                     logging.info(f"Exception while attempting BLE disconnect check {type(e)} {e}")
         except Exception as e:
