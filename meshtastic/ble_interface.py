@@ -145,7 +145,7 @@ class BLEInterface(MeshInterface):
 
         if address:
             with BLEClient() as client:
-                logging.info(f"Attempting connection to BLE device {address} without scan (5s timeout)")
+                logging.info(f"Attempting connection to BLE device {address} without scan")
 
                 device = client.find_device_by_filter(
                     filterfunc=lambda d, ad: (ad.local_name == address or d.address.lower() == address),
@@ -153,6 +153,7 @@ class BLEInterface(MeshInterface):
                 )
 
                 if device:
+                    logging.info("Device found")
                     return device
 
         addressed_devices = BLEInterface.scan()
@@ -173,6 +174,7 @@ class BLEInterface(MeshInterface):
             raise BLEInterface.BLEError(
                 f"More than one Meshtastic BLE peripheral with identifier or address '{address}' found."
             )
+
         return addressed_devices[0]
 
     def _sanitize_address(self, address: Optional[str]) -> Optional[str]:  # pylint: disable=E0213
@@ -185,7 +187,6 @@ class BLEInterface(MeshInterface):
     def connect(self, address: Optional[str] = None) -> "BLEClient":
         "Connect to a device by address."
 
-        # Bleak docs recommend always doing a scan before connecting (even if we know addr)
         device = self.find_device(address)
         client = BLEClient(device, disconnected_callback=lambda _: self.close())
         client.connect()
@@ -274,6 +275,7 @@ class BLEClient:
             target=self._run_event_loop, name="BLEClient", daemon=True
         )
         self._eventThread.start()
+        self.address = address
 
         if not address and not device:
             logging.debug("No address/device provided - only discover method will work.")
