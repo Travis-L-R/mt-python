@@ -139,11 +139,15 @@ class BLEInterface(MeshInterface):
                 filter(lambda d: SERVICE_UUID in d[1].service_uuids, devices)
             )
             return list(map(lambda d: d[0], devices))
-
-    def find_device(self, address: Optional[str]) -> BLEDevice:
+        
+    def find_device(self, 
+                    address: Optional[str], 
+                    with_scan: Optional[bool]=True,
+                    scan_only: Optional[bool]=False,
+                    ) -> BLEDevice:
         """Find a device by address."""
 
-        if address:
+        if not scan_only and address:
             with BLEClient() as client:
                 logging.info(f"Attempting connection to BLE device {address} without scan")
 
@@ -155,6 +159,9 @@ class BLEInterface(MeshInterface):
                 if device:
                     logging.info("Device found")
                     return device
+
+        if with_scan == False:
+            raise BLEInterface.BLEError(f"Could not find device with scan disabled")
 
         addressed_devices = BLEInterface.scan()
 
@@ -186,8 +193,37 @@ class BLEInterface(MeshInterface):
 
     def connect(self, address: Optional[str] = None) -> "BLEClient":
         "Connect to a device by address."
+        
+        try:
+            device = self.find_device(address, with_scan=False if address else True)
+        except BLEInterface.BLEError:
+            device = None
+            if address:
+                try: 
+                    from subprocess import call, check_output
+                    logging.info(f"Disconnecting from {address}, in case still connected via OS")
+                    mac_address = address if len(address) == 7 and address[2] == ":" else None
 
-        device = self.find_device(address)
+                    if mac_address is None:
+                        device_strings = check_output(["bluetoothctl", "devices"]).decode().split("\n")
+                        for d_string in device_strings:
+                            if d_string.endswith(address):
+                                mac_address = d_string.split(" ")[-2]
+                                break
+
+                    if mac_address:
+                        call(["bluetoothctl", "disconnect", mac_address])
+                    else:
+                        logging.warning("Couldn't find desired address in list of known devices")
+                except Exception as e:
+                    logging.info(f"Exception while attempting BLE disconnect check {type(e)} {e}")
+        except Exception as e:
+            device = None
+            logging.warning(f"Unexpected exception {type(e)} {e}.")
+
+        if not device:
+            device = self.find_device(address, scan_only=True)
+
         client = BLEClient(device, disconnected_callback=lambda _: self.close())
         client.connect()
         client.discover()
