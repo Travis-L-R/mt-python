@@ -198,6 +198,16 @@ class BLEInterface(MeshInterface):
             device = self.find_device(address, with_scan=False if address else True)
         except BLEInterface.BLEError:
             device = None
+            if self.address:
+                try: 
+                    from subprocess import call
+                    logging.info(f"Disconnecting from {self.address}, in case still connected via OS")
+                    call(["bluetoothctl", "disconnect", self.address])
+                except Exception as e:
+                    logging.info(f"Exception while attempting BLE disconnect check {type(e)} {e}")
+        except Exception as e:
+            device = None
+            logging.warning(f"Unexpected exception {type(e)} {e}.")
 
         if not device:
             device = self.find_device(address, scan_only=True)
