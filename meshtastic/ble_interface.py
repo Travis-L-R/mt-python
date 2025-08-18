@@ -139,11 +139,15 @@ class BLEInterface(MeshInterface):
                 filter(lambda d: SERVICE_UUID in d[1].service_uuids, devices)
             )
             return list(map(lambda d: d[0], devices))
-
-    def find_device(self, address: Optional[str]) -> BLEDevice:
+        
+    def find_device(self, 
+                    address: Optional[str], 
+                    with_scan: Optional[bool]=True,
+                    scan_only: Optional[bool]=False,
+                    ) -> BLEDevice:
         """Find a device by address."""
 
-        if address:
+        if not scan_only and address:
             with BLEClient() as client:
                 logging.info(f"Attempting connection to BLE device {address} without scan")
 
@@ -155,6 +159,9 @@ class BLEInterface(MeshInterface):
                 if device:
                     logging.info("Device found")
                     return device
+
+        if with_scan == False:
+            raise BLEInterface.BLEError(f"Could not find device with scan disabled")
 
         addressed_devices = BLEInterface.scan()
 
@@ -186,8 +193,15 @@ class BLEInterface(MeshInterface):
 
     def connect(self, address: Optional[str] = None) -> "BLEClient":
         "Connect to a device by address."
+        
+        try:
+            device = self.find_device(address, with_scan=False if address else True)
+        except BLEInterface.BLEError:
+            device = None
 
-        device = self.find_device(address)
+        if not device:
+            device = self.find_device(address, scan_only=True)
+
         client = BLEClient(device, disconnected_callback=lambda _: self.close())
         client.connect()
         client.discover()
