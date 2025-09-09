@@ -118,7 +118,14 @@ class Config(google.protobuf.message.Message):
                but should not be given priority over other routers in order to avoid unnecessaraily
                consuming hops.
             """
-            CLIENT_LATE: Config.DeviceConfig._Role.ValueType  # 12
+            CLIENT_BASE: Config.DeviceConfig._Role.ValueType  # 12
+            """
+            Description: Treats packets from or to favorited nodes as ROUTER, and all other packets as CLIENT.
+            Technical Details: Used for stronger attic/roof nodes to distribute messages more widely
+               from weaker, indoor, or less-well-positioned nodes. Recommended for users with multiple nodes
+               where one CLIENT_BASE acts as a more powerful base station, such as an attic/roof node.
+            """
+            CLIENT_LATE: Config.DeviceConfig._Role.ValueType  # 13
             """
             Description: Device that will wait until other nodes should have rebroadcast, and only rebroadcast if no one else has and channel utilization is low)
             Technical Details: Intended for use when a node wouldn't normally be able to contribute helpfully to the mesh, but you still want it to be able to.
@@ -207,7 +214,14 @@ class Config(google.protobuf.message.Message):
            but should not be given priority over other routers in order to avoid unnecessaraily
            consuming hops.
         """
-        CLIENT_LATE: Config.DeviceConfig.Role.ValueType  # 12
+        CLIENT_BASE: Config.DeviceConfig.Role.ValueType  # 12
+        """
+        Description: Treats packets from or to favorited nodes as ROUTER, and all other packets as CLIENT.
+        Technical Details: Used for stronger attic/roof nodes to distribute messages more widely
+           from weaker, indoor, or less-well-positioned nodes. Recommended for users with multiple nodes
+           where one CLIENT_BASE acts as a more powerful base station, such as an attic/roof node.
+        """
+        CLIENT_LATE: Config.DeviceConfig.Role.ValueType  # 13
         """
         Description: Device that will wait until other nodes should have rebroadcast, and only rebroadcast if no one else has and channel utilization is low)
         Technical Details: Intended for use when a node wouldn't normally be able to contribute helpfully to the mesh, but you still want it to be able to.
@@ -1060,11 +1074,11 @@ class Config(google.protobuf.message.Message):
             """
             OLED_SH1107: Config.DisplayConfig._OledType.ValueType  # 3
             """
-            Can not be auto detected but set by proto. Used for 128x128 screens
-            """
-            OLED_SH1107_128_64: Config.DisplayConfig._OledType.ValueType  # 4
-            """
             Can not be auto detected but set by proto. Used for 128x64 screens
+            """
+            OLED_SH1107_128_128: Config.DisplayConfig._OledType.ValueType  # 4
+            """
+            Can not be auto detected but set by proto. Used for 128x128 screens
             """
 
         class OledType(_OledType, metaclass=_OledTypeEnumTypeWrapper):
@@ -1086,11 +1100,11 @@ class Config(google.protobuf.message.Message):
         """
         OLED_SH1107: Config.DisplayConfig.OledType.ValueType  # 3
         """
-        Can not be auto detected but set by proto. Used for 128x128 screens
-        """
-        OLED_SH1107_128_64: Config.DisplayConfig.OledType.ValueType  # 4
-        """
         Can not be auto detected but set by proto. Used for 128x64 screens
+        """
+        OLED_SH1107_128_128: Config.DisplayConfig.OledType.ValueType  # 4
+        """
+        Can not be auto detected but set by proto. Used for 128x128 screens
         """
 
         class _DisplayMode:
