@@ -89,6 +89,7 @@ class DestinationsConfig(google.protobuf.message.Message):
     LORA_SWITCH_ENABLED_FIELD_NUMBER: builtins.int
     ONLY_LORA_SWITCH_FROM_US_FIELD_NUMBER: builtins.int
     ONLY_LEAP_SWITCH_MESSAGES_FIELD_NUMBER: builtins.int
+    NODEINFO_CHANNEL_FIELD_NUMBER: builtins.int
     default_dest: builtins.int
     """
     Optional default destination for most types of packets that would otherwise be sent to broadcast.
@@ -128,6 +129,11 @@ class DestinationsConfig(google.protobuf.message.Message):
     Whether to restrict leaping with LoRa radio setting changes to messages.
     Only works if only_lora_switch_from_us is not set and the message is decodable.
     """
+    nodeinfo_channel: builtins.int
+    """
+    Option to select alternative channel to send nodeinfo broadcasts out on.
+    E.g. for if your primary channel is private but you still want your info to appear on a default (but secondary) channel
+    """
     @property
     def destinations(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___DestinationsConfig.MeshDestination]:
         """
@@ -147,7 +153,8 @@ class DestinationsConfig(google.protobuf.message.Message):
         lora_switch_enabled: builtins.bool = ...,
         only_lora_switch_from_us: builtins.bool = ...,
         only_leap_switch_messages: builtins.bool = ...,
+        nodeinfo_channel: builtins.int = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing.Literal["default_dest", b"default_dest", "destinations", b"destinations", "leap_channel", b"leap_channel", "leaps_enabled", b"leaps_enabled", "lora_switch_enabled", b"lora_switch_enabled", "nodeinfo_dest", b"nodeinfo_dest", "only_leap_switch_messages", b"only_leap_switch_messages", "only_lora_switch_from_us", b"only_lora_switch_from_us", "position_dest", b"position_dest", "telemetry_dest", b"telemetry_dest"]) -> None: ...
+    def ClearField(self, field_name: typing.Literal["default_dest", b"default_dest", "destinations", b"destinations", "leap_channel", b"leap_channel", "leaps_enabled", b"leaps_enabled", "lora_switch_enabled", b"lora_switch_enabled", "nodeinfo_channel", b"nodeinfo_channel", "nodeinfo_dest", b"nodeinfo_dest", "only_leap_switch_messages", b"only_leap_switch_messages", "only_lora_switch_from_us", b"only_lora_switch_from_us", "position_dest", b"position_dest", "telemetry_dest", b"telemetry_dest"]) -> None: ...
 
 global___DestinationsConfig = DestinationsConfig
