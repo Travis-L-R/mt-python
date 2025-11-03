@@ -37,12 +37,11 @@ class TCPInterface(StreamInterface):
 
         self.socket: Optional[socket.socket] = None
 
-        if connectNow:
-            self.myConnect()
-        else:
-            self.socket = None
-
         super().__init__(debugOut=debugOut, noProto=noProto, connectNow=connectNow, noNodes=noNodes)
+
+    def connect(self) -> None:
+        self.myConnect()
+        super().connect()
 
     def __repr__(self):
         rep = f"TCPInterface({self.hostname!r}"

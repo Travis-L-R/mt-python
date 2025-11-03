@@ -30,16 +30,21 @@ class SerialInterface(StreamInterface):
 
         self.devPath: Optional[str] = devPath
 
+        StreamInterface.__init__(
+            self, debugOut=debugOut, noProto=noProto, connectNow=connectNow, noNodes=noNodes
+        )
+    
+    def connect(self) -> None:
         if self.devPath is None:
             ports: List[str] = meshtastic.util.findPorts(True)
             logger.debug(f"ports:{ports}")
             if len(ports) == 0:
-                print("No Serial Meshtastic device detected, attempting TCP connection on localhost.")
-                return
+                raise Exception("No Serial Meshtastic device detected")
             elif len(ports) > 1:
                 message: str = "Warning: Multiple serial ports were detected so one serial port must be specified with the '--port'.\n"
                 message += f"  Ports detected:{ports}"
-                meshtastic.util.our_exit(message)
+                # todo: was meshtastic.util.our_exit(message), make new exception class
+                raise Exception(message)
             else:
                 self.devPath = ports[0]
 
@@ -56,9 +61,7 @@ class SerialInterface(StreamInterface):
         self.stream.flush()	# type: ignore[attr-defined]
         time.sleep(0.1)
 
-        StreamInterface.__init__(
-            self, debugOut=debugOut, noProto=noProto, connectNow=connectNow, noNodes=noNodes
-        )
+        super().connect()
 
     def _set_hupcl_with_termios(self, f: TextIOWrapper):
         """first we need to set the HUPCL so the device will not reboot based on RTS and/or DTR

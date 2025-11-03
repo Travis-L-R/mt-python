@@ -139,6 +139,10 @@ class MeshInterface:  # pylint: disable=R0902
         if debugOut:
             pub.subscribe(MeshInterface._printLogLine, "meshtastic.log.line")
 
+    def connect(self) -> None:
+        """Connect the interface"""
+        pass
+
     def close(self):
         """Shutdown this interface"""
         if self.heartbeatTimer:
