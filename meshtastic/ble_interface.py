@@ -367,7 +367,7 @@ class BLEClient:
         except TimeoutError:
             return None
         except Exception as e:
-            print(f"Exception during BLEClient async call: {type(e)}: {e}")
+            logging.warning(f"Exception during BLEClient async call: {type(e)}: {e}", exc_info=True)
 
     def async_run(self, coro):  # pylint: disable=C0116
         return asyncio.run_coroutine_threadsafe(coro, self._eventLoop)
