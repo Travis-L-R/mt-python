@@ -110,69 +110,104 @@ def checkChannel(interface: MeshInterface, channelIndex: int) -> bool:
 
 def getPref(node, comp_name) -> bool:
     """Get a channel or preferences value"""
-    def _printSetting(config_type, uni_name, pref_value, repeated):
+    def _printSetting(key, pref_value, repeated):
         """Pretty print the setting"""
         if repeated:
-            pref_value = [meshtastic.util.toStr(v) for v in pref_value]
+            pref_value = str([meshtastic.util.toStr(v) for v in pref_value])
         else:
             pref_value = meshtastic.util.toStr(pref_value)
-        print(f"{str(config_type.name)}.{uni_name}: {str(pref_value)}")
-        logger.debug(f"{str(config_type.name)}.{uni_name}: {str(pref_value)}")
+        print(f"{key}: {pref_value}")
+        logger.debug(f"{key}: {pref_value}")
 
-    name = splitCompoundName(comp_name)
-    wholeField = name[0] == name[1]  # We want the whole field
-
-    camel_name = meshtastic.util.snake_to_camel(name[1])
-    # Note: protobufs has the keys in snake_case, so snake internally
-    snake_name = meshtastic.util.camel_to_snake(name[1])
-    uni_name = camel_name if mt_config.camel_case else snake_name
-    logger.debug(f"snake_name:{snake_name} camel_name:{camel_name}")
-    logger.debug(f"use camel:{mt_config.camel_case}")
+    # split the name of the preference into parts (e.g. 'head.middle.tail' = ['
+    key_parts = comp_name.split(".")
 
     # First validate the input
     localConfig = node.localConfig
     moduleConfig = node.moduleConfig
-    found: bool = False
-    for config in [localConfig, moduleConfig]:
-        objDesc = config.DESCRIPTOR
-        config_type = objDesc.fields_by_name.get(name[0])
-        pref = ""		#FIXME - is this correct to leave as an empty string if not found?
-        if config_type:
-            pref = config_type.message_type.fields_by_name.get(snake_name)
-            if pref or wholeField:
-                found = True
-                break
 
-    if not found:
+    # Variables to keep track of the protobufs message objects and descriptor objects as we traverse the config trees
+    # pref_msg should end up being the message *that contains* the tail part of the config key
+    pref_msg = None
+    current_msg = None
+    parent_descriptor = None
+    current_descriptor = None
+
+    # check if anything matches the head of the config key
+    for config in [node.localConfig, node.moduleConfig]:
+        parent_descriptor = config.DESCRIPTOR
+        current_descriptor = parent_descriptor.fields_by_name.get(meshtastic.util.snake_to_camel(key_parts[0]))
+
+        if current_descriptor:
+            # we've found the correct config section for this key
+            current_msg = config
+            break
+
+    # if nothing matches, print the options and return
+    if not current_msg:
         print(
-            f"{localConfig.__class__.__name__} and {moduleConfig.__class__.__name__} do not have attribute {uni_name}."
+            f"Unknown config attribute {comp_name}."
         )
         print("Choices are...")
-        printConfig(localConfig)
-        printConfig(moduleConfig)
+        printConfig(node.localConfig)
+        printConfig(node.moduleConfig)
         return False
 
-    # Check if we need to request the config
-    if len(config.ListFields()) != 0 and not isinstance(pref, str): # if str, it's still the empty string, I think
-        # read the value
-        config_values = getattr(config, config_type.name)
-        if not wholeField:
-            pref_value = getattr(config_values, pref.name)
-            repeated = pref.label == pref.LABEL_REPEATED
-            _printSetting(config_type, uni_name, pref_value, repeated)
+    if len(key_parts) == 1:
+        # We want the whole set of values for this group of config preferences 
+        pref_msg = current_msg
+    else:
+        for key_part in key_parts[1:]:
+            # Messages may have repeated fields, which can be addressed in the form of head.middle.[position].tail
+            # If we have encountered a field that can be repeated, get the one we're looking for and continue on
+            if current_descriptor.label == current_descriptor.LABEL_REPEATED and parent_descriptor != current_descriptor:
+                try:
+                    current_msg = getattr(current_msg, current_descriptor.name, [])[int(key_part)]
+                    parent_descriptor = current_descriptor
+                    continue
+               except ValueError:
+                    print(f"Could not parse index of {key_part} for config key {comp_name} in {current_descriptor.name}")
+                    return False
+                except IndexError:
+                    print(f"Could not find config at index {key_part} for config key {comp_name} in {current_descriptor.name}")
+                    return False
+
+            parent_descriptor = current_descriptor
+
+            if current_descriptor.label != current_descriptor.LABEL_REPEATED:
+                current_msg = getattr(current_msg, current_descriptor.name)
+
+            # recurse to the next field
+            current_descriptor = current_descriptor.message_type.fields_by_name.get(meshtastic.util.camel_to_snake(key_part))
+
+        # take the final protobufs message as the message containing the final tail field
+        pref_msg = current_msg
+
+    # Check if we need to request the config 
+    if len(config.ListFields()) != 0 and pref_msg is not None:
+
+        # read the value(s)
+        if len(key_parts) != 1:
+            pref_value = getattr(pref_msg, meshtastic.util.camel_to_snake(key_parts[-1]))
+            repeated = current_descriptor.label == current_descriptor.LABEL_REPEATED
+            _printSetting(comp_name, pref_value, repeated)
         else:
-            for field in config_values.ListFields():
+            pref_value = getattr(pref_msg, current_descriptor.name)
+            for field in pref_value.ListFields():
                 repeated = field[0].label == field[0].LABEL_REPEATED
-                _printSetting(config_type, field[0].name, field[1], repeated)
+                _printSetting(f"{comp_name}.{field[0].name}", field[1], repeated)
     else:
         # Always show whole field for remote node
-        node.requestConfig(config_type)
+        node.requestConfig(current_descriptor)
+        # todo: work out how that should actually work (shouldn't be the descriptor I presume)
 
     return True
 
-
 def splitCompoundName(comp_name: str) -> List[str]:
     """Split compound (dot separated) preference name into parts"""
+    from warnings import warn
+    warn('splitCompoundName() is deprecated.', DeprecationWarning, stacklevel=2)
+
     name: List[str] = comp_name.split(".")
     if len(name) < 2:
         name[0] = comp_name
