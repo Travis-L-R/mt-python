@@ -165,7 +165,7 @@ def getPref(node, comp_name) -> bool:
                     current_msg = getattr(current_msg, current_descriptor.name, [])[int(key_part)]
                     parent_descriptor = current_descriptor
                     continue
-               except ValueError:
+                except ValueError:
                     print(f"Could not parse index of {key_part} for config key {comp_name} in {current_descriptor.name}")
                     return False
                 except IndexError:
