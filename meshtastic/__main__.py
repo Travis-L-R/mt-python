@@ -29,6 +29,7 @@ except ImportError as e:
 
 import yaml
 from google.protobuf.json_format import MessageToDict
+from google.protobuf.message_factory import GetMessageClass
 from pubsub import pub  # type: ignore[import-untyped]
 
 try:
@@ -108,100 +109,185 @@ def checkChannel(interface: MeshInterface, channelIndex: int) -> bool:
     return ch and ch.role != channel_pb2.Channel.Role.DISABLED
 
 
-def getPref(node, comp_name) -> bool:
-    """Get a channel or preferences value"""
-    def _printSetting(key, pref_value, repeated):
-        """Pretty print the setting"""
-        if repeated:
-            pref_value = str([meshtastic.util.toStr(v) for v in pref_value])
-        else:
-            pref_value = meshtastic.util.toStr(pref_value)
-        print(f"{key}: {pref_value}")
-        logger.debug(f"{key}: {pref_value}")
 
-    # split the name of the preference into parts (e.g. 'head.middle.tail' = ['
-    key_parts = comp_name.split(".")
+def getPBFieldByKey(parent, key, field_descriptor=None, populate_empty=False):
+    key_parts = key.split(".")
 
-    # First validate the input
-    localConfig = node.localConfig
-    moduleConfig = node.moduleConfig
+    head_key = meshtastic.util.camel_to_snake(key_parts[0])
 
-    # Variables to keep track of the protobufs message objects and descriptor objects as we traverse the config trees
-    # pref_msg should end up being the message *that contains* the tail part of the config key
-    pref_msg = None
-    current_msg = None
-    parent_descriptor = None
-    current_descriptor = None
+    # grab the parent descriptor from the parent if we aren't supplied with one
+    parent_descriptor = getattr(parent, 'DESCRIPTOR', None)
 
-    # check if anything matches the head of the config key
-    for config in [node.localConfig, node.moduleConfig]:
-        parent_descriptor = config.DESCRIPTOR
-        current_descriptor = parent_descriptor.fields_by_name.get(meshtastic.util.snake_to_camel(key_parts[0]))
+    # repeated fields may come in a container (parent_descriptor will be None) but we should then have a field_descriptor we can get the message_type from
+    if parent_descriptor is None: # todo cleanup and field_descriptor:
+        parent_descriptor = field_descriptor.message_type
 
-        if current_descriptor:
-            # we've found the correct config section for this key
-            current_msg = config
-            break
+    # or if it's not repeated, we may need to get the field_descriptor from the parent
+    if field_descriptor is None:
+        try:
+            field_descriptor = parent_descriptor.fields_by_name[head_key]
+        except KeyError:
+            raise KeyError(f"{parent_descriptor.name} has no key {head_key}", parent_descriptor)
 
-    # if nothing matches, print the options and return
-    if not current_msg:
-        print(
-            f"Unknown config attribute {comp_name}."
-        )
-        print("Choices are...")
-        printConfig(node.localConfig)
-        printConfig(node.moduleConfig)
-        return False
+    item = None
 
+    repeated = field_descriptor.label == field_descriptor.LABEL_REPEATED if field_descriptor else False
+    message_type = field_descriptor.message_type if field_descriptor else None
+
+    if repeated:
+        # may be a repeated message that we are trying to reach by index (or the child of one)
+        try:
+            item = parent[int(head_key)]
+        except ValueError:
+            pass
+        except IndexError as e:
+            # looking for a repeated field value at index but that position is empty/non-existant
+            idx = int(head_key)
+            if not populate_empty:
+                raise IndexError(f"No {message_type} at index {idx}", parent_descriptor) from e
+            else:
+                msg_class = GetMessageClass(message_type)
+                values = [v for v in parent]
+
+                # add empty messages in between and for our new one
+                num_additions = idx - len(values) + 1
+                for _ in range(0,num_additions):
+                    new_msg = msg_class() if msg_class is not None else None
+                    values.append(new_msg)
+
+                # replace the old values with the new ones
+                del parent[:]
+                parent.extend(values)
+
+                # set the last of those new items as the one we're looking for, grabbing it fresh from the parent
+                item = parent[idx]
+
+    # not a repeated field
+    if not item:
+        # get the value/field
+        try:
+            item = getattr(parent, head_key)
+            field_descriptor = parent_descriptor.fields_by_name[head_key]
+        except AttributeError:
+            raise KeyError(f"{parent_descriptor.name} has no key {head_key}", parent_descriptor)
+
+    # return or recurse through the keys
     if len(key_parts) == 1:
-        # We want the whole set of values for this group of config preferences 
-        pref_msg = current_msg
+        return item, field_descriptor, parent
     else:
-        for key_part in key_parts[1:]:
-            # Messages may have repeated fields, which can be addressed in the form of head.middle.[position].tail
-            # If we have encountered a field that can be repeated, get the one we're looking for and continue on
-            if current_descriptor.label == current_descriptor.LABEL_REPEATED and parent_descriptor != current_descriptor:
-                try:
-                    current_msg = getattr(current_msg, current_descriptor.name, [])[int(key_part)]
-                    parent_descriptor = current_descriptor
-                    continue
-                except ValueError:
-                    print(f"Could not parse index of {key_part} for config key {comp_name} in {current_descriptor.name}")
-                    return False
-                except IndexError:
-                    print(f"Could not find config at index {key_part} for config key {comp_name} in {current_descriptor.name}")
-                    return False
+        return getPBFieldByKey(item, key=".".join(key_parts[1:]), field_descriptor=field_descriptor, populate_empty=populate_empty)
 
-            parent_descriptor = current_descriptor
+def provideConfigMessage(key, node=None, parent=None, populate_empty=False):
+    key_parts = key.split(".")
+    head_key = meshtastic.util.camel_to_snake(key_parts[0])
 
-            if current_descriptor.label != current_descriptor.LABEL_REPEATED:
-                current_msg = getattr(current_msg, current_descriptor.name)
-
-            # recurse to the next field
-            current_descriptor = current_descriptor.message_type.fields_by_name.get(meshtastic.util.camel_to_snake(key_part))
-
-        # take the final protobufs message as the message containing the final tail field
-        pref_msg = current_msg
-
-    # Check if we need to request the config 
-    if len(config.ListFields()) != 0 and pref_msg is not None:
-
-        # read the value(s)
-        if len(key_parts) != 1:
-            pref_value = getattr(pref_msg, meshtastic.util.camel_to_snake(key_parts[-1]))
-            repeated = current_descriptor.label == current_descriptor.LABEL_REPEATED
-            _printSetting(comp_name, pref_value, repeated)
+    # if no starting message is supplied, try to get it from the node 
+    if parent is None:
+        if head_key in node.localConfig.DESCRIPTOR.fields_by_name:
+            parent = node.localConfig
+        elif head_key in node.moduleConfig.DESCRIPTOR.fields_by_name:
+            parent = node.moduleConfig
         else:
-            pref_value = getattr(pref_msg, current_descriptor.name)
-            for field in pref_value.ListFields():
-                repeated = field[0].label == field[0].LABEL_REPEATED
-                _printSetting(f"{comp_name}.{field[0].name}", field[1], repeated)
-    else:
-        # Always show whole field for remote node
-        node.requestConfig(current_descriptor)
-        # todo: work out how that should actually work (shouldn't be the descriptor I presume)
+            raise KeyError(f"Key {head_key} not found in localConfig or moduleConfig", None)
 
-    return True
+    return getPBFieldByKey(parent, key, populate_empty=populate_empty)
+
+
+def printConfigSetting(label, pref, field_descriptor, show_optional_defaults=True, do_print=True, depth=0):
+    """Pretty print the setting"""
+    output = None
+
+    if not isinstance(pref, (str, bytes)):
+        # presume it could be repeated (iterable container type)
+        try:
+            output = ""
+            for i,v in enumerate(pref):
+
+                output += printConfigSetting(i, v, field_descriptor, show_optional_defaults=show_optional_defaults, depth=depth+1)
+
+            output = f"{'  ' * depth}{label + ':' if label else ''}\n" + output if show_optional_defaults or output else ""
+        except TypeError:
+            output = None
+        except Exception as e:
+            logging.warning(f"Unexpected error while trying to iterate config setting {type(e)} {e}")
+
+    if output is None:
+        # presume it could have fields
+        try:
+            fields = pref.DESCRIPTOR.fields
+            output = ""
+            for field_descriptor in fields:
+                output += printConfigSetting(field_descriptor.name, getattr(pref, field_descriptor.name, None), field_descriptor, show_optional_defaults=show_optional_defaults,depth=depth+1)
+            if show_optional_defaults or output:
+                output = f"{'  ' * depth}" + (label + ":\n" if label else '') + output
+
+        except AttributeError:
+            output = None
+        except Exception as e:
+            logging.warning(f"Unexpected error while trying to work through config fields {type(e)} {e}")
+
+    if output is None:
+        # match any enum config values if we can
+        enum_value = None
+        try:
+            enum_value = field_descriptor.enum_type.values[pref].name
+        except AttributeError:
+            pass
+        except Exception as e:
+            logging.warning(f"Unexpected error while trying to parse enum {type(e)} {e}")
+
+        # skip printing optional fields set to the default value (when desired) 
+        try:
+            show = show_optional_defaults or field_descriptor.label != field_descriptor.LABEL_OPTIONAL or field_descriptor.default_value != pref
+        except AttributeError:
+            show = True
+
+        output = f"{'  ' * depth}{label + ':' if label else ''} {enum_value if enum_value is not None else meshtastic.util.toStr(pref)}\n" if show else ""
+
+    if do_print and depth == 0:
+        print(output)
+
+    return output
+
+
+def printConfigChoices(node=None, e=None, descriptor=None):
+    if e is not None and len(e.args) == 2:
+        descriptor = e.args[1]
+
+    if descriptor is not None:
+        try:
+            print(f"Options for {descriptor.name}:")
+            print("\n".join(["  "+fd.name for fd in descriptor.fields]))
+            return
+        except AttributeError as tempe:
+            logger.warning(f"ae in pCC {tempe}",exc_info=True)
+            pass
+
+    if node is not None:
+        print("Config options:\n===============")
+        printConfig(node.localConfig, deep=False)
+        print("\nModule options:\n===============")
+        printConfig(node.moduleConfig, deep=False)
+
+
+def getPref(node, comp_name, do_print=True) -> any:
+    """Get a channel or preferences value"""
+    # split the name of the preference into parts (e.g. 'head.middle.tail' = ['
+    try:
+        pref, field_descriptor, _ = provideConfigMessage(key=comp_name, node=node)
+    except KeyError as e:
+        print(f"Unknown config key {comp_name}\n")
+        printConfigChoices(node=node, e=e)
+        raise KeyError(f"Unknown config key {comp_name}") from e
+    except IndexError as e:
+        print(f"No config with that index for {comp_name}\n")
+        raise e
+
+    if do_print:
+        printConfigSetting(comp_name, pref, field_descriptor)
+
+    return pref
+
 
 def splitCompoundName(comp_name: str) -> List[str]:
     """Split compound (dot separated) preference name into parts"""
@@ -215,47 +301,32 @@ def splitCompoundName(comp_name: str) -> List[str]:
     return name
 
 
-def traverseConfig(config_root, config, interface_config) -> bool:
+def traverseConfigDict(config_root, config, interface_config) -> bool:
     """Iterate through current config level preferences and either traverse deeper if preference is a dict or set preference"""
     snake_name = meshtastic.util.camel_to_snake(config_root)
     for pref in config:
         pref_name = f"{snake_name}.{pref}"
         if isinstance(config[pref], dict):
-            traverseConfig(pref_name, config[pref], interface_config)
+            traverseConfigDict(pref_name, config[pref], interface_config)
         else:
             setPref(interface_config, pref_name, config[pref])
-
     return True
 
 
 def setPref(config, comp_name, raw_val) -> bool:
     """Set a channel or preferences value"""
 
-    name = splitCompoundName(comp_name)
 
-    snake_name = meshtastic.util.camel_to_snake(name[-1])
-    camel_name = meshtastic.util.snake_to_camel(name[-1])
-    uni_name = camel_name if mt_config.camel_case else snake_name
-    logger.debug(f"snake_name:{snake_name}")
-    logger.debug(f"camel_name:{camel_name}")
+    key_parts = comp_name.split(".")
 
-    objDesc = config.DESCRIPTOR
-    config_part = config
-    config_type = objDesc.fields_by_name.get(name[0])
-    if config_type and config_type.message_type is not None:
-        for name_part in name[1:-1]:
-            part_snake_name = meshtastic.util.camel_to_snake((name_part))
-            config_part = getattr(config, config_type.name)
-            config_type = config_type.message_type.fields_by_name.get(part_snake_name)
-    pref = None
-    if config_type and config_type.message_type is not None:
-        pref = config_type.message_type.fields_by_name.get(snake_name)
-    # Others like ChannelSettings are standalone
-    elif config_type:
-        pref = config_type
-
-    if (not pref) or (not config_type):
-        return False
+    try:
+        pref, field_descriptor, parent_pref = provideConfigMessage(key=comp_name, parent=config, populate_empty=True)
+    except KeyError as e:
+        print(f"Unknown config key {comp_name}\n")
+        raise e
+    except Exception as e:
+        logger.warning(f"Exception trying to get config message {type(e)} {e}", exc_info=True)
+        raise e
 
     if isinstance(raw_val, str):
         val = meshtastic.util.fromStr(raw_val)
@@ -263,11 +334,17 @@ def setPref(config, comp_name, raw_val) -> bool:
         val = raw_val
     logger.debug(f"valStr:{raw_val} val:{val}")
 
+    snake_name = meshtastic.util.camel_to_snake(key_parts[-1])
+
+    # temp:
+    name = key_parts
+    uni_name = snake_name
+
     if snake_name == "wifi_psk" and len(str(raw_val)) < 8:
         print("Warning: network.wifi_psk must be 8 or more characters.")
         return False
 
-    enumType = pref.enum_type
+    enumType = field_descriptor.enum_type
     # pylint: disable=C0123
     if enumType and type(val) == str:
         # We've failed so far to convert this string into an enum, try to find it by reflection
@@ -288,35 +365,38 @@ def setPref(config, comp_name, raw_val) -> bool:
             return False
 
     # repeating fields need to be handled with append, not setattr
-    if pref.label != pref.LABEL_REPEATED:
+    if field_descriptor.label != field_descriptor.LABEL_REPEATED:
         try:
-            if config_type.message_type is not None:
-                config_values = getattr(config_part, config_type.name)
-                setattr(config_values, pref.name, val)
-            else:
-                setattr(config_part, snake_name, val)
+            # is this a simple field or does it take a message?
+            setattr(parent_pref, field_descriptor.name, val)
         except TypeError:
             # The setter didn't like our arg type guess try again as a string
-            config_values = getattr(config_part, config_type.name)
-            setattr(config_values, pref.name, str(val))
+            setattr(parent_pref, field_descriptor.name, str(val))
     elif type(val) == list:
-        new_vals = [meshtastic.util.fromStr(x) for x in val]
-        config_values = getattr(config, config_type.name)
-        getattr(config_values, pref.name)[:] = new_vals
-    else:
-        config_values = getattr(config, config_type.name)
-        if val == 0:
-            # clear values
-            print(f"Clearing {pref.name} list")
-            del getattr(config_values, pref.name)[:]
+        new_vals = []
+
+        if not field_descriptor.message_type:
+            new_vals = val
+            del pref[:]
+            pref.extend(new_vals)
         else:
-            print(f"Adding '{raw_val}' to the {pref.name} list")
-            cur_vals = [x for x in getattr(config_values, pref.name) if x not in [0, "", b""]]
-            cur_vals.append(val)
-            getattr(config_values, pref.name)[:] = cur_vals
+            for idx, v in enumerate(pref):
+                try:
+                    v = val[idx]
+                except IndexError:
+                    break
+    else:
+        # We weren't supplied a list when we should expect one if it's a repeated field
+        if val == 0:
+            # Assume that we want to clear all values if we get passed "0"
+            print(f"Clearing {field_descriptor.name} list")
+            del pref[:]
+        else:
+            # Or, assume that we want to add a single value to whatever is already tehre.
+            pref.extend(val)
         return True
 
-    prefix = f"{'.'.join(name[0:-1])}." if config_type.message_type is not None else ""
+    prefix = f"{'.'.join(name[0:-1])}." if field_descriptor.message_type is not None else ""
     print(f"Set {prefix}{uni_name} to {raw_val}")
 
     return True
@@ -328,6 +408,7 @@ def onConnected(interface):
     waitForAckNak = (
         False  # Should we wait for an acknowledgment if we send to a remote node?
     )
+
     try:
         args = mt_config.args
 
@@ -715,10 +796,14 @@ def onConnected(interface):
                             node.requestConfig(
                                 config.DESCRIPTOR.fields_by_name.get(field)
                             )
-                        found = setPref(config, pref[0], pref[1])
-                        if found:
-                            fields.add(field)
-                            break
+                        try:
+                            found = setPref(config, pref[0], pref[1])
+                            if found:
+                                fields.add(field)
+                                break
+                        except KeyError as e:
+                            found = False
+                            printConfigChoices(node=node, e=e)
 
             if found:
                 print("Writing modified preferences to device")
@@ -730,18 +815,6 @@ def onConnected(interface):
                     node.writeConfig(field)
                 if len(fields) > 1:
                     node.commitSettingsTransaction()
-            else:
-                if mt_config.camel_case:
-                    print(
-                        f"{node.localConfig.__class__.__name__} and {node.moduleConfig.__class__.__name__} do not have an attribute {pref[0]}."
-                    )
-                else:
-                    print(
-                        f"{node.localConfig.__class__.__name__} and {node.moduleConfig.__class__.__name__} do not have attribute {pref[0]}."
-                    )
-                print("Choices are...")
-                printConfig(node.localConfig)
-                printConfig(node.moduleConfig)
 
         if args.configure:
             with open(args.configure[0], encoding="utf8") as file:
@@ -830,7 +903,7 @@ def onConnected(interface):
                 if "config" in configuration:
                     localConfig = interface.getNode(args.dest, **getNode_kwargs).localConfig
                     for section in configuration["config"]:
-                        traverseConfig(
+                        traverseConfigDict(
                             section, configuration["config"][section], localConfig
                         )
                         interface.getNode(args.dest, **getNode_kwargs).writeConfig(
@@ -841,7 +914,7 @@ def onConnected(interface):
                 if "module_config" in configuration:
                     moduleConfig = interface.getNode(args.dest, **getNode_kwargs).moduleConfig
                     for section in configuration["module_config"]:
-                        traverseConfig(
+                        traverseConfigDict(
                             section,
                             configuration["module_config"][section],
                             moduleConfig,
@@ -972,6 +1045,34 @@ def onConnected(interface):
         if args.ch_shortfast:
             setSimpleConfig(config_pb2.Config.LoRaConfig.ModemPreset.SHORT_FAST)
 
+        if args.ch_get:
+            closeNow = True
+
+            selectedChannels = [mt_config.channel_index] if mt_config.channel_index is not None else range(0,8)
+            selections = [x for x in args.ch_get if x]
+
+            node = interface.getNode(args.dest, **getNode_kwargs)
+            output = ""
+            for channelIndex in selectedChannels:
+                output += f"Channel {channelIndex}\n"
+                try:
+                    ch = node.channels[channelIndex]
+                    if not selections:
+                        output += printConfigSetting("", ch, None, show_optional_defaults=True, do_print=False)
+                    else:
+                        for s in selections:
+                            pref, field_descriptor, _ =  getPBFieldByKey(ch,s)
+                            output += printConfigSetting(s, pref, field_descriptor, show_optional_defaults=True, do_print=False, depth=1)
+
+                    output += "\n"
+                except KeyError as e:
+                    print(f"Unknown channel config key\n")
+                    printConfigChoices(node=node, e=e)
+                    output = None
+                    break
+            if output:
+                print(output)
+
         if args.ch_set or args.ch_enable or args.ch_disable:
             closeNow = True
 
@@ -1003,28 +1104,11 @@ def onConnected(interface):
                     found = True
                     ch.settings.psk = meshtastic.util.fromPSK(pref[1])
                 else:
-                    found = setPref(ch.settings, pref[0], pref[1])
-                if not found:
-                    category_settings = ["module_settings"]
-                    print(
-                        f"{ch.settings.__class__.__name__} does not have an attribute {pref[0]}."
-                    )
-                    print("Choices are...")
-                    for field in ch.settings.DESCRIPTOR.fields:
-                        if field.name not in category_settings:
-                            print(f"{field.name}")
-                        else:
-                            print(f"{field.name}:")
-                            config = ch.settings.DESCRIPTOR.fields_by_name.get(
-                                field.name
-                            )
-                            names = []
-                            for sub_field in config.message_type.fields:
-                                tmp_name = f"{field.name}.{sub_field.name}"
-                                names.append(tmp_name)
-                            for temp_name in sorted(names):
-                                print(f"    {temp_name}")
-
+                    try:
+                        found = setPref(ch.settings, pref[0], pref[1])
+                    except KeyError as e:
+                        found = False
+                        printConfigChoices(node=node, e=e)
                 enable = True  # If we set any pref, assume the user wants to enable the channel
 
             if enable:
@@ -1075,8 +1159,13 @@ def onConnected(interface):
         if args.get:
             closeNow = True
             node = interface.getNode(args.dest, False, **getNode_kwargs)
+            found = False
             for pref in args.get:
-                found = getPref(node, pref[0])
+                try:
+                    getPref(node, pref[0])
+                    found = True
+                except (KeyError, IndexError):
+                    pass
 
             if found:
                 print("Completed getting preferences")
@@ -1168,25 +1257,29 @@ def onConnected(interface):
 
     except Exception as ex:
         print(f"Aborting due to: {ex}")
+        logger.warning(f"Abort exception {type(ex)} {ex}", exc_info=True)
         interface.close()  # close the connection now, so that our app exits
         sys.exit(1)
 
 
-def printConfig(config) -> None:
+def printConfig(config, deep=True) -> None:
     """print configuration"""
     objDesc = config.DESCRIPTOR
     for config_section in objDesc.fields:
         if config_section.name != "version":
             config = objDesc.fields_by_name.get(config_section.name)
-            print(f"{config_section.name}:")
-            names = []
-            for field in config.message_type.fields:
-                tmp_name = f"{config_section.name}.{field.name}"
-                if mt_config.camel_case:
-                    tmp_name = meshtastic.util.snake_to_camel(tmp_name)
-                names.append(tmp_name)
-            for temp_name in sorted(names):
-                print(f"    {temp_name}")
+            if not deep:
+                print(f"{config_section.name}")
+            else:
+                print(f"{config_section.name}:")
+                names = []
+                for field in config.message_type.fields:
+                    tmp_name = f"{config_section.name}.{field.name}"
+                    if mt_config.camel_case:
+                        tmp_name = meshtastic.util.snake_to_camel(tmp_name)
+                    names.append(tmp_name)
+                for temp_name in sorted(names):
+                    print(f"    {temp_name}")
 
 
 def onNode(node) -> None:
@@ -1220,13 +1313,16 @@ def export_config(interface) -> str:
     configObj = {}
 
     # A list of configuration keys that should be set to False if they are missing
-    true_defaults = {
+    config_true_defaults = {
         ("bluetooth", "enabled"),
         ("lora", "sx126xRxBoostedGain"),
         ("lora", "txEnabled"),
         ("lora", "usePreset"),
         ("position", "positionBroadcastSmartEnabled"),
         ("security", "serialEnabled"),
+    }
+
+    module_true_defaults = {
         ("mqtt", "encryptionEnabled"),
     }
 
@@ -1288,7 +1384,7 @@ def export_config(interface) -> str:
         else:
             configObj["config"] = config
 
-        set_missing_flags_false(configObj["config"], true_defaults)
+        set_missing_flags_false(configObj["config"], config_true_defaults)
 
     module_config = MessageToDict(interface.localNode.moduleConfig)
     if module_config:
@@ -1301,6 +1397,8 @@ def export_config(interface) -> str:
             configObj["module_config"] = prefs
         else:
             configObj["module_config"] = prefs
+
+        set_missing_flags_false(configObj["module_config"], module_true_defaults)
 
     config_txt = "# start of Meshtastic configure yaml\n"		#checkme - "config" (now changed to config_out)
                                                                         #was used as a string here and a Dictionary above
@@ -1780,7 +1878,7 @@ def addChannelConfigArgs(parser: argparse.ArgumentParser) -> argparse.ArgumentPa
     group.add_argument(
         "--ch-set",
         help=(
-            "Set a channel parameter. To see channel settings available:'--ch-set all all --ch-index 0'. "
+            "Set a channel parameter."
             "Can set the 'psk' using this command. To disable encryption on primary channel:'--ch-set psk none --ch-index 0'. "
             "To set encryption with a new random key on second channel:'--ch-set psk random --ch-index 1'. "
             "To set encryption back to the default:'--ch-set psk default --ch-index 0'. To set encryption with your "
@@ -1789,6 +1887,17 @@ def addChannelConfigArgs(parser: argparse.ArgumentParser) -> argparse.ArgumentPa
         nargs=2,
         action="append",
         metavar=("FIELD", "VALUE"),
+    )
+
+    group.add_argument(
+        "--ch-get",
+        help=(
+            "Get a channel parameter. To see all settings for a channel available:'--ch-get'. "
+        ),
+        nargs="?",
+        default=[],
+        action="append",
+        metavar="FIELD",
     )
 
     group.add_argument(
