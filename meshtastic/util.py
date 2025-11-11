@@ -15,6 +15,7 @@ from typing import Any, Dict, List, NoReturn, Optional, Set, Tuple, Union
 
 from google.protobuf.json_format import MessageToJson
 from google.protobuf.message import Message
+from google.protobuf.message_factory import GetMessageClass
 
 import packaging.version as pkg_version
 import requests
@@ -698,3 +699,72 @@ def message_to_json(message: Message, multiline: bool=False) -> str:
     except TypeError:
         json = MessageToJson(message, including_default_value_fields=True) # type: ignore[call-arg] # pylint: disable=E1123
     return stripnl(json) if not multiline else json
+
+def get_pb_field_by_key(parent, key, field_descriptor=None, populate_empty=False):
+    "Doing dodgy thing of recording the parent field descriptor as a second argument to a generic KeyError so that we can inform the try/except block"
+    key_parts = key.split(".")
+    head_key = camel_to_snake(key_parts[0])
+
+    # grab the parent descriptor from the parent if we aren't supplied with one
+    parent_descriptor = getattr(parent, 'DESCRIPTOR', None)
+
+    # repeated fields may come in a container (parent_descriptor will be None) 
+    # but can instead be supplied a field_descriptor that we can get the message_type from
+    if parent_descriptor is None:
+        parent_descriptor = field_descriptor.message_type
+
+    # if it's not repeated, we may need to get the field_descriptor from the parent
+    if field_descriptor is None:
+        try:
+            field_descriptor = parent_descriptor.fields_by_name[head_key]
+        except KeyError as e:
+            raise KeyError(f"{parent_descriptor.name} has no key {head_key}", parent_descriptor) from e
+
+    item = None
+
+    repeated = field_descriptor.label == field_descriptor.LABEL_REPEATED if field_descriptor else False
+    message_type = field_descriptor.message_type if field_descriptor else None
+
+    if repeated:
+        # may be a repeated message that we are trying to reach by index (or the child of one)
+        try:
+            item = parent[int(head_key)]
+        except ValueError:
+            # head_key can't be interpreted as an int, so it's not an index (continue)
+            pass
+        except IndexError as e:
+            # looking for a repeated field value at index but that position is empty/non-existant
+            idx = int(head_key)
+            if not populate_empty:
+                raise IndexError(f"No {message_type} at index {idx}", parent_descriptor) from e
+            else:
+                msg_class = GetMessageClass(message_type)
+                values = list(parent)
+
+                # add empty messages in between and for our new one
+                num_additions = idx - len(values) + 1
+                for _ in range(0,num_additions):
+                    new_msg = msg_class() if msg_class is not None else None
+                    values.append(new_msg)
+
+                # replace the old values with the new ones
+                del parent[:]
+                parent.extend(values)
+
+                # set the last of those new items as the one we're looking for, grabbing it fresh from the parent
+                item = parent[idx]
+
+    # not a repeated field
+    if not item:
+        # get the value/field
+        try:
+            item = getattr(parent, head_key)
+            field_descriptor = parent_descriptor.fields_by_name[head_key]
+        except AttributeError as e:
+            raise KeyError(f"{parent_descriptor.name} has no key {head_key}", parent_descriptor) from e
+
+    # return or recurse through the keys
+    if len(key_parts) == 1:
+        return item, field_descriptor, parent
+    else:
+        return get_pb_field_by_key(item, key=".".join(key_parts[1:]), field_descriptor=field_descriptor, populate_empty=populate_empty)

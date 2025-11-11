@@ -16,6 +16,7 @@ from meshtastic.util import (
     pskToString,
     stripnl,
     message_to_json,
+    get_pb_field_by_key,
 )
 
 logger = logging.getLogger(__name__)
@@ -183,45 +184,24 @@ class Node:
             our_exit("Error: No localConfig has been read")
 
         p = admin_pb2.AdminMessage()
-        
-        config_found = False
-
-        for field_name, source_config in (
-            ('device', 'localConfig'),
-            ('position', 'localConfig'),
-            ('power', 'localConfig'),
-            ('network', 'localConfig'),
-            ('display', 'localConfig'),
-            ('lora', 'localConfig'),
-            ('bluetooth', 'localConfig'),
-            ('security', 'localConfig'),
-            ('destinations', 'localConfig'),
-
-            ('mqtt', 'moduleConfig'),
-            ('serial', 'moduleConfig'),
-            ('external_notification', 'moduleConfig'),
-            ('store_forward', 'moduleConfig'),
-            ('range_test', 'moduleConfig'),
-            ('telemetry', 'moduleConfig'),
-            ('canned_message', 'moduleConfig'),
-            ('audio', 'moduleConfig'),
-            ('remote_hardware', 'moduleConfig'),
-            ('neighbor_info', 'moduleConfig'),
-            ('detection_sensor', 'moduleConfig'),
-            ('ambient_lighting', 'moduleConfig'),
-            ('paxcounter', 'moduleConfig'),
-            ): 
-            if config_name == field_name:
-                config_found = True
-                config = getattr(self, source_config)
-                set_config_obj = getattr(p.set_config if source_config == 'localConfig' else p.set_module_config, field_name) 
-                set_config_obj.CopyFrom(getattr(config, field_name))
+            
+        config = None
+        for source_config, packet_set_config in ((self.localConfig, p.set_config),
+                                                (self.moduleConfig, p.set_module_config)):
+            try:
+                pref, _, parent = get_pb_field_by_key(source_config, config_name)
+                config = source_config
+                print(type(pref), type(parent), type(packet_set_config), type(config), getattr(packet_set_config,config_name, None))
+                getattr(packet_set_config,config_name).CopyFrom(pref)
                 break
-
-        if not config_found:
+            except (KeyError, AttributeError):
+                pass
+            
+        if not config:
             our_exit(f"Error: No valid config with name {config_name}")
 
         logger.debug(f"Wrote: {config_name}")
+       
         if self == self.iface.localNode:
             onResponse = None
         else:

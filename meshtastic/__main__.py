@@ -29,7 +29,6 @@ except ImportError as e:
 
 import yaml
 from google.protobuf.json_format import MessageToDict
-from google.protobuf.message_factory import GetMessageClass
 from pubsub import pub  # type: ignore[import-untyped]
 
 try:
@@ -109,74 +108,6 @@ def checkChannel(interface: MeshInterface, channelIndex: int) -> bool:
     return ch and ch.role != channel_pb2.Channel.Role.DISABLED
 
 
-
-def getPBFieldByKey(parent, key, field_descriptor=None, populate_empty=False):
-    key_parts = key.split(".")
-
-    head_key = meshtastic.util.camel_to_snake(key_parts[0])
-
-    # grab the parent descriptor from the parent if we aren't supplied with one
-    parent_descriptor = getattr(parent, 'DESCRIPTOR', None)
-
-    # repeated fields may come in a container (parent_descriptor will be None) but we should then have a field_descriptor we can get the message_type from
-    if parent_descriptor is None: # todo cleanup and field_descriptor:
-        parent_descriptor = field_descriptor.message_type
-
-    # or if it's not repeated, we may need to get the field_descriptor from the parent
-    if field_descriptor is None:
-        try:
-            field_descriptor = parent_descriptor.fields_by_name[head_key]
-        except KeyError:
-            raise KeyError(f"{parent_descriptor.name} has no key {head_key}", parent_descriptor)
-
-    item = None
-
-    repeated = field_descriptor.label == field_descriptor.LABEL_REPEATED if field_descriptor else False
-    message_type = field_descriptor.message_type if field_descriptor else None
-
-    if repeated:
-        # may be a repeated message that we are trying to reach by index (or the child of one)
-        try:
-            item = parent[int(head_key)]
-        except ValueError:
-            pass
-        except IndexError as e:
-            # looking for a repeated field value at index but that position is empty/non-existant
-            idx = int(head_key)
-            if not populate_empty:
-                raise IndexError(f"No {message_type} at index {idx}", parent_descriptor) from e
-            else:
-                msg_class = GetMessageClass(message_type)
-                values = [v for v in parent]
-
-                # add empty messages in between and for our new one
-                num_additions = idx - len(values) + 1
-                for _ in range(0,num_additions):
-                    new_msg = msg_class() if msg_class is not None else None
-                    values.append(new_msg)
-
-                # replace the old values with the new ones
-                del parent[:]
-                parent.extend(values)
-
-                # set the last of those new items as the one we're looking for, grabbing it fresh from the parent
-                item = parent[idx]
-
-    # not a repeated field
-    if not item:
-        # get the value/field
-        try:
-            item = getattr(parent, head_key)
-            field_descriptor = parent_descriptor.fields_by_name[head_key]
-        except AttributeError:
-            raise KeyError(f"{parent_descriptor.name} has no key {head_key}", parent_descriptor)
-
-    # return or recurse through the keys
-    if len(key_parts) == 1:
-        return item, field_descriptor, parent
-    else:
-        return getPBFieldByKey(item, key=".".join(key_parts[1:]), field_descriptor=field_descriptor, populate_empty=populate_empty)
-
 def provideConfigMessage(key, node=None, parent=None, populate_empty=False):
     key_parts = key.split(".")
     head_key = meshtastic.util.camel_to_snake(key_parts[0])
@@ -190,7 +121,7 @@ def provideConfigMessage(key, node=None, parent=None, populate_empty=False):
         else:
             raise KeyError(f"Key {head_key} not found in localConfig or moduleConfig", None)
 
-    return getPBFieldByKey(parent, key, populate_empty=populate_empty)
+    return meshtastic.util.get_pb_field_by_key(parent, key, populate_empty=populate_empty)
 
 
 def printConfigSetting(label, pref, field_descriptor, show_optional_defaults=True, do_print=True, depth=0):
@@ -1048,7 +979,7 @@ def onConnected(interface):
         if args.ch_get:
             closeNow = True
 
-            selectedChannels = [mt_config.channel_index] if mt_config.channel_index is not None else range(0,8)
+            selectedChannels = [mt_config.channel_index] if mt_config.channel_index is not None else range(0,len(node.channels))
             selections = [x for x in args.ch_get if x]
 
             node = interface.getNode(args.dest, **getNode_kwargs)
@@ -1061,7 +992,7 @@ def onConnected(interface):
                         output += printConfigSetting("", ch, None, show_optional_defaults=True, do_print=False)
                     else:
                         for s in selections:
-                            pref, field_descriptor, _ =  getPBFieldByKey(ch,s)
+                            pref, field_descriptor, _ =  meshtastic.util.get_pb_field_by_key(ch,s)
                             output += printConfigSetting(s, pref, field_descriptor, show_optional_defaults=True, do_print=False, depth=1)
 
                     output += "\n"
@@ -1733,7 +1664,7 @@ def addConfigArgs(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
         ),
         nargs=1,
         action="append",
-        metavar="FIELD"
+        metavar="FIELD",
     )
 
     group.add_argument(
