@@ -1,4 +1,0 @@
-[submodule "protobufs"]
-	path = protobufs
-	url = https://github.com/Travis-L-R/mt-protobufs.git
-	branch = destinations_lora_switch

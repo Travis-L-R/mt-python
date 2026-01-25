@@ -257,6 +257,7 @@ class MeshInterface:  # pylint: disable=R0902
                 "channel": "Channel",
                 "lastHeard": "LastHeard",
                 "since": "Since",
+                "isFavorite": "Fav",
 
             }
 
@@ -304,7 +305,7 @@ class MeshInterface:  # pylint: disable=R0902
             showFields = ["N", "user.longName", "user.id", "user.shortName", "user.hwModel", "user.publicKey",
                           "user.role", "position.latitude", "position.longitude", "position.altitude",
                           "deviceMetrics.batteryLevel", "deviceMetrics.channelUtilization",
-                          "deviceMetrics.airUtilTx", "snr", "hopsAway", "channel", "lastHeard", "since"]
+                          "deviceMetrics.airUtilTx", "snr", "hopsAway", "channel", "isFavorite", "lastHeard", "since"]
         else:
             # Always at least include the row number.
             showFields.insert(0, "N")
@@ -346,6 +347,8 @@ class MeshInterface:  # pylint: disable=R0902
                             formatted_value = "Powered"
                         else:
                             formatted_value = formatFloat(raw_value, 0, "%")
+                    elif field == "isFavorite":
+                        formatted_value = "*" if raw_value else ""
                     elif field == "lastHeard":
                         formatted_value = getLH(raw_value)
                     elif field == "position.latitude":
@@ -834,6 +837,7 @@ class MeshInterface:  # pylint: disable=R0902
         self,
         name,
         description,
+        icon,
         expire: int,
         waypoint_id: Optional[int] = None,
         latitude: float = 0.0,
@@ -852,6 +856,7 @@ class MeshInterface:  # pylint: disable=R0902
         w = mesh_pb2.Waypoint()
         w.name = name
         w.description = description
+        w.icon = icon
         w.expire = expire
         if waypoint_id is None:
             # Generate a waypoint's id, NOT a packet ID.

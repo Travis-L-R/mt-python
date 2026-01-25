@@ -7,7 +7,7 @@ import time
 
 from typing import Optional, Union, List
 
-from meshtastic.protobuf import admin_pb2, apponly_pb2, channel_pb2, destinations_pb2, localonly_pb2, mesh_pb2, portnums_pb2
+from meshtastic.protobuf import admin_pb2, apponly_pb2, channel_pb2, config_pb2, destinations_pb2, localonly_pb2, mesh_pb2, portnums_pb2
 from meshtastic.util import (
     Timeout,
     camel_to_snake,
@@ -17,6 +17,9 @@ from meshtastic.util import (
     stripnl,
     message_to_json,
     get_pb_field_by_key,
+    generate_channel_hash,
+    to_node_num,
+    flags_to_list,
 )
 
 logger = logging.getLogger(__name__)
@@ -52,6 +55,16 @@ class Node:
             r += ", timeout={self._timeout.expireTimeout!r}"
         r += ")"
         return r
+
+    @staticmethod
+    def position_flags_list(position_flags: int) -> List[str]:
+        "Return a list of position flags from the given flags integer"
+        return flags_to_list(config_pb2.Config.PositionConfig.PositionFlags, position_flags)
+
+    @staticmethod
+    def excluded_modules_list(excluded_modules: int) -> List[str]:
+        "Return a list of excluded modules from the given flags integer"
+        return flags_to_list(mesh_pb2.ExcludedModules, excluded_modules)
 
     def module_available(self, excluded_bit: int) -> bool:
         """Check DeviceMetadata.excluded_modules to see if a module is available."""
@@ -680,11 +693,7 @@ class Node:
     def removeNode(self, nodeId: Union[int, str]):
         """Tell the node to remove a specific node by ID"""
         self.ensureSessionKey()
-        if isinstance(nodeId, str):
-            if nodeId.startswith("!"):
-                nodeId = int(nodeId[1:], 16)
-            else:
-                nodeId = int(nodeId)
+        nodeId = to_node_num(nodeId)
 
         p = admin_pb2.AdminMessage()
         p.remove_by_nodenum = nodeId
@@ -739,11 +748,7 @@ class Node:
     def setFavorite(self, nodeId: Union[int, str]):
         """Tell the node to set the specified node ID to be favorited on the NodeDB on the device"""
         self.ensureSessionKey()
-        if isinstance(nodeId, str):
-            if nodeId.startswith("!"):
-                nodeId = int(nodeId[1:], 16)
-            else:
-                nodeId = int(nodeId)
+        nodeId = to_node_num(nodeId)
 
         p = admin_pb2.AdminMessage()
         p.set_favorite_node = nodeId
@@ -757,11 +762,7 @@ class Node:
     def removeFavorite(self, nodeId: Union[int, str]):
         """Tell the node to set the specified node ID to be un-favorited on the NodeDB on the device"""
         self.ensureSessionKey()
-        if isinstance(nodeId, str):
-            if nodeId.startswith("!"):
-                nodeId = int(nodeId[1:], 16)
-            else:
-                nodeId = int(nodeId)
+        nodeId = to_node_num(nodeId)
 
         p = admin_pb2.AdminMessage()
         p.remove_favorite_node = nodeId
@@ -775,11 +776,7 @@ class Node:
     def setIgnored(self, nodeId: Union[int, str]):
         """Tell the node to set the specified node ID to be ignored on the NodeDB on the device"""
         self.ensureSessionKey()
-        if isinstance(nodeId, str):
-            if nodeId.startswith("!"):
-                nodeId = int(nodeId[1:], 16)
-            else:
-                nodeId = int(nodeId)
+        nodeId = to_node_num(nodeId)
 
         p = admin_pb2.AdminMessage()
         p.set_ignored_node = nodeId
@@ -793,11 +790,7 @@ class Node:
     def removeIgnored(self, nodeId: Union[int, str]):
         """Tell the node to set the specified node ID to be un-ignored on the NodeDB on the device"""
         self.ensureSessionKey()
-        if isinstance(nodeId, str):
-            if nodeId.startswith("!"):
-                nodeId = int(nodeId[1:], 16)
-            else:
-                nodeId = int(nodeId)
+        nodeId = to_node_num(nodeId)
 
         p = admin_pb2.AdminMessage()
         p.remove_ignored_node = nodeId
@@ -927,6 +920,18 @@ class Node:
             logger.debug(f"Received metadata {stripnl(c)}")
             print(f"\nfirmware_version: {c.firmware_version}")
             print(f"device_state_version: {c.device_state_version}")
+            if c.role in config_pb2.Config.DeviceConfig.Role.values():
+                print(f"role: {config_pb2.Config.DeviceConfig.Role.Name(c.role)}")
+            else:
+                print(f"role: {c.role}")
+            print(f"position_flags: {self.position_flags_list(c.position_flags)}")
+            if c.hw_model in mesh_pb2.HardwareModel.values():
+                print(f"hw_model: {mesh_pb2.HardwareModel.Name(c.hw_model)}")
+            else:
+                print(f"hw_model: {c.hw_model}")
+            print(f"hasPKC: {c.hasPKC}")
+            if c.excluded_modules > 0:
+                print(f"excluded_modules: {self.excluded_modules_list(c.excluded_modules)}")
 
     def onResponseRequestChannel(self, p):
         """Handle the response packet for requesting a channel _requestChannel()"""
@@ -1020,10 +1025,7 @@ class Node:
             ):  # unless a special channel index was used, we want to use the admin index
                 adminIndex = self.iface.localNode._getAdminChannelIndex()
             logger.debug(f"adminIndex:{adminIndex}")
-            if isinstance(self.nodeNum, int):
-                nodeid = self.nodeNum
-            else: # assume string starting with !
-                nodeid = int(self.nodeNum[1:],16)
+            nodeid = to_node_num(self.nodeNum)
             if "adminSessionPassKey" in self.iface._getOrCreateByNum(nodeid):
                 p.session_passkey = self.iface._getOrCreateByNum(nodeid).get("adminSessionPassKey")
             return self.iface.sendData(
@@ -1044,9 +1046,23 @@ class Node:
                 f"Not ensuring session key, because protocol use is disabled by noProto"
             )
         else:
-            if isinstance(self.nodeNum, int):
-                nodeid = self.nodeNum
-            else: # assume string starting with !
-                nodeid = int(self.nodeNum[1:],16)
+            nodeid = to_node_num(self.nodeNum)
             if self.iface._getOrCreateByNum(nodeid).get("adminSessionPassKey") is None:
                 self.requestConfig(admin_pb2.AdminMessage.SESSIONKEY_CONFIG)
+
+    def get_channels_with_hash(self):
+        """Return a list of dicts with channel info and hash."""
+        result = []
+        if self.channels:
+            for c in self.channels:
+                if c.settings and hasattr(c.settings, "name") and hasattr(c.settings, "psk"):
+                    hash_val = generate_channel_hash(c.settings.name, c.settings.psk)
+                else:
+                    hash_val = None
+                result.append({
+                    "index": c.index,
+                    "role": channel_pb2.Channel.Role.Name(c.role),
+                    "name": c.settings.name if c.settings and hasattr(c.settings, "name") else "",
+                    "hash": hash_val,
+                })
+        return result
