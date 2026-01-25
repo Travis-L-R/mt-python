@@ -265,6 +265,7 @@ class LoRaConfig(google.protobuf.message.Message):
         LONG_SLOW: LoRaConfig._ModemPreset.ValueType  # 1
         """
         Long Range - Slow
+        Deprecated in 2.7: Unpopular slow preset.
         """
         VERY_LONG_SLOW: LoRaConfig._ModemPreset.ValueType  # 2
         """
@@ -297,9 +298,14 @@ class LoRaConfig(google.protobuf.message.Message):
         This is the fastest preset and the only one with 500kHz bandwidth.
         It is not legal to use in all regions due to this wider bandwidth.
         """
+        LONG_TURBO: LoRaConfig._ModemPreset.ValueType  # 9
+        """
+        Long Range - Turbo
+        This preset performs similarly to LongFast, but with 500Khz bandwidth.
+        """
         NO_PRESET: LoRaConfig._ModemPreset.ValueType  # 255
         """
-        Used in LoRaConfigLite to signify modem settings that don't use a preset
+        Signifier for the absence of a preset
         """
 
     class ModemPreset(_ModemPreset, metaclass=_ModemPresetEnumTypeWrapper):
@@ -315,6 +321,7 @@ class LoRaConfig(google.protobuf.message.Message):
     LONG_SLOW: LoRaConfig.ModemPreset.ValueType  # 1
     """
     Long Range - Slow
+    Deprecated in 2.7: Unpopular slow preset.
     """
     VERY_LONG_SLOW: LoRaConfig.ModemPreset.ValueType  # 2
     """
@@ -347,9 +354,14 @@ class LoRaConfig(google.protobuf.message.Message):
     This is the fastest preset and the only one with 500kHz bandwidth.
     It is not legal to use in all regions due to this wider bandwidth.
     """
+    LONG_TURBO: LoRaConfig.ModemPreset.ValueType  # 9
+    """
+    Long Range - Turbo
+    This preset performs similarly to LongFast, but with 500Khz bandwidth.
+    """
     NO_PRESET: LoRaConfig.ModemPreset.ValueType  # 255
     """
-    Used in LoRaConfigLite to signify modem settings that don't use a preset
+    Signifier for the absence of a preset
     """
 
     USE_PRESET_FIELD_NUMBER: builtins.int
@@ -436,8 +448,6 @@ class LoRaConfig(google.protobuf.message.Message):
     algorithm to derive the channel number")
     If using the hash algorithm the channel number will be: hash(channel_name) %
     NUM_CHANNELS (Where num channels depends on the regulatory region).
-
-    65535 is treated as "unset" for some purposes
     """
     override_duty_cycle: builtins.bool
     """

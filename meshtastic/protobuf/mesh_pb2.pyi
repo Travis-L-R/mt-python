@@ -523,6 +523,30 @@ class _HardwareModelEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._
     """
     RAK3401
     """
+    RAK6421: _HardwareModel.ValueType  # 118
+    """
+    RAK6421 Hat+
+    """
+    THINKNODE_M4: _HardwareModel.ValueType  # 119
+    """
+    Elecrow ThinkNode M4
+    """
+    THINKNODE_M6: _HardwareModel.ValueType  # 120
+    """
+    Elecrow ThinkNode M6
+    """
+    MESHSTICK_1262: _HardwareModel.ValueType  # 121
+    """
+    Elecrow Meshstick 1262
+    """
+    TBEAM_1_WATT: _HardwareModel.ValueType  # 122
+    """
+    LilyGo T-Beam 1W
+    """
+    T5_S3_EPAPER_PRO: _HardwareModel.ValueType  # 123
+    """
+    LilyGo T5 S3 ePaper Pro (V1 and V2)
+    """
     PRIVATE_HW: _HardwareModel.ValueType  # 255
     """
     ------------------------------------------------------------------------------------------------------------------------------------------
@@ -1028,6 +1052,30 @@ RAK WISMESH_TAP_V2 with ESP32-S3 CPU
 RAK3401: HardwareModel.ValueType  # 117
 """
 RAK3401
+"""
+RAK6421: HardwareModel.ValueType  # 118
+"""
+RAK6421 Hat+
+"""
+THINKNODE_M4: HardwareModel.ValueType  # 119
+"""
+Elecrow ThinkNode M4
+"""
+THINKNODE_M6: HardwareModel.ValueType  # 120
+"""
+Elecrow ThinkNode M6
+"""
+MESHSTICK_1262: HardwareModel.ValueType  # 121
+"""
+Elecrow Meshstick 1262
+"""
+TBEAM_1_WATT: HardwareModel.ValueType  # 122
+"""
+LilyGo T-Beam 1W
+"""
+T5_S3_EPAPER_PRO: HardwareModel.ValueType  # 123
+"""
+LilyGo T5 S3 ePaper Pro (V1 and V2)
 """
 PRIVATE_HW: HardwareModel.ValueType  # 255
 """
