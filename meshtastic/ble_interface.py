@@ -383,7 +383,7 @@ class BLEClient:
             return None
         except Exception as e:
             logging.warning(f"Exception during BLEClient async call: {type(e)}: {e}", exc_info=True)
-    return result
+        return result
 
     def async_run(self, coro):  # pylint: disable=C0116
         return asyncio.run_coroutine_threadsafe(coro, self._eventLoop)
