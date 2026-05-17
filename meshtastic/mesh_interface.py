@@ -1445,7 +1445,6 @@ class MeshInterface:  # pylint: disable=R0902
                     set_config_obj = getattr(config, field_name)
                     set_config_obj.CopyFrom(getattr(radio_config, field_name))
                     break
-                )
 
         else:
             logger.debug("Unexpected FromRadio payload")
