@@ -171,11 +171,10 @@ class Node:
             p.get_config_request = configType
 
         else:
-            msgIndex = configType.index
             if configType.containing_type.name == "LocalConfig":
-                p.get_config_request = msgIndex
+                p.get_config_request = admin_pb2.AdminMessage.ConfigType.Value(configType.name.upper() + "_CONFIG")
             else:
-                p.get_module_config_request = msgIndex
+                p.get_module_config_request = configType.index
 
         self._sendAdmin(p, wantResponse=True, onResponse=onResponse)
         if onResponse:
@@ -197,7 +196,7 @@ class Node:
             our_exit("Error: No localConfig has been read")
 
         p = admin_pb2.AdminMessage()
-            
+
         config = None
         for source_config, packet_set_config in ((self.localConfig, p.set_config),
                                                 (self.moduleConfig, p.set_module_config)):
@@ -209,7 +208,6 @@ class Node:
                 break
             except (KeyError, AttributeError):
                 pass
-            
         if not config:
             our_exit(f"Error: No valid config with name {config_name}")
 
@@ -620,7 +618,7 @@ class Node:
         return self._sendAdmin(p, onResponse=onResponse)
 
     def rebootOTA(self, secs: int = 10):
-        """Tell the node to reboot into factory firmware."""
+        """Tell the node to reboot into factory firmware (firmware < 2.7.18)."""
         self.ensureSessionKey()
         p = admin_pb2.AdminMessage()
         p.reboot_ota_seconds = secs
@@ -632,6 +630,22 @@ class Node:
         else:
             onResponse = self.onAckNak
         return self._sendAdmin(p, onResponse=onResponse)
+
+    def startOTA(
+        self,
+        ota_mode: admin_pb2.OTAMode.ValueType,
+        ota_file_hash: bytes,
+    ):
+        """Tell the node to start OTA mode (firmware >= 2.7.18)."""
+        if self != self.iface.localNode:
+            raise ValueError("startOTA only possible in local node")
+
+        self.ensureSessionKey()
+        p = admin_pb2.AdminMessage()
+        p.ota_request.reboot_ota_mode = ota_mode
+        p.ota_request.ota_hash = ota_file_hash
+
+        return self._sendAdmin(p)
 
     def enterDFUMode(self):
         """Tell the node to enter DFU mode (NRF52)."""
