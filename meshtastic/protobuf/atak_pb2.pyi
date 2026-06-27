@@ -807,6 +807,25 @@ class _CotTypeEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTy
     t-s: Task / engage request. Structured payload carried via the new
     TaskRequest typed variant.
     """
+    CotType_m_t_t: _CotType.ValueType  # 125
+    """-- TAKTALK plugin shapes --
+    CoT types unique to the TAKTALK ATAK plugin. Note `y-` has a literal
+    trailing dash and no second atom — that's the wire format ATAK emits
+    for TAKTALK room broadcasts. The CotType enum encodes the literal
+    string verbatim (CotType_y -> "y-") so receivers reconstruct the
+    original event type byte-for-byte without consulting cot_type_str.
+
+
+    m-t-t: TAKTALK voice/text chat message. Payload carried via the
+    TakTalkMessage typed variant (text, chatroom_id, lang, from_voice).
+    """
+    CotType_y: _CotType.ValueType  # 126
+    """
+    y-: TAKTALK room/membership broadcast. Payload carried via the
+    TakTalkRoomData typed variant (sender_callsign, room_id, room_name,
+    participants). The CoT type literally has a trailing dash and no
+    second atom — not a typo.
+    """
 
 class CotType(_CotType, metaclass=_CotTypeEnumTypeWrapper):
     """
@@ -1301,6 +1320,25 @@ CotType_t_s: CotType.ValueType  # 124
 t-s: Task / engage request. Structured payload carried via the new
 TaskRequest typed variant.
 """
+CotType_m_t_t: CotType.ValueType  # 125
+"""-- TAKTALK plugin shapes --
+CoT types unique to the TAKTALK ATAK plugin. Note `y-` has a literal
+trailing dash and no second atom — that's the wire format ATAK emits
+for TAKTALK room broadcasts. The CotType enum encodes the literal
+string verbatim (CotType_y -> "y-") so receivers reconstruct the
+original event type byte-for-byte without consulting cot_type_str.
+
+
+m-t-t: TAKTALK voice/text chat message. Payload carried via the
+TakTalkMessage typed variant (text, chatroom_id, lang, from_voice).
+"""
+CotType_y: CotType.ValueType  # 126
+"""
+y-: TAKTALK room/membership broadcast. Payload carried via the
+TakTalkRoomData typed variant (sender_callsign, room_id, room_name,
+participants). The CoT type literally has a trailing dash and no
+second atom — not a typo.
+"""
 global___CotType = CotType
 
 class _GeoPointSource:
@@ -1463,6 +1501,9 @@ class GeoChat(google.protobuf.message.Message):
     TO_CALLSIGN_FIELD_NUMBER: builtins.int
     RECEIPT_FOR_UID_FIELD_NUMBER: builtins.int
     RECEIPT_TYPE_FIELD_NUMBER: builtins.int
+    LANG_FIELD_NUMBER: builtins.int
+    ROOM_ID_FIELD_NUMBER: builtins.int
+    VOICE_PROFILE_ID_FIELD_NUMBER: builtins.int
     message: builtins.str
     """
     The text message. Empty for receipts.
@@ -1487,6 +1528,39 @@ class GeoChat(google.protobuf.message.Message):
     Receipt kind discriminator. See ReceiptType doc. Default ReceiptType_None
     means this is a regular chat message, not a receipt.
     """
+    lang: builtins.str
+    """
+    --- TAKTALK-flavored b-t-f extensions ---
+
+    Set when the ATAK TAKTALK plugin originates the chat, so the message
+    carries the room/language metadata TAKTALK uses to thread its UI.
+    These fields are absent / empty for non-TAKTALK CoT chat, so the wire
+    cost is paid only when TAKTALK is actually involved.
+
+    Wire shape in source XML (inside <event type="b-t-f">/<detail>):
+      <Ea>English</Ea>                          - lang
+      <roomId>UUID</roomId>                     - room_id
+      <voice_profile_id>X</voice_profile_id>    - voice_profile_id
+      <voice_profile_id/>                       - empty marker; encoded as
+                                                  present-but-empty string
+
+
+    BCP-47-ish language tag or human-readable name (e.g. "en", "English")
+    that the originator's TAKTALK plugin recorded for the message.
+    """
+    room_id: builtins.str
+    """
+    TAKTALK chatroom UUID (e.g. "30b2755c-c547-44ef-a0cc-cdbd8a15616f") that
+    the receiver's TAKTALK plugin uses to thread the message under the
+    right room. Resolved to a friendly name via TakTalkRoomData broadcasts.
+    """
+    voice_profile_id: builtins.str
+    """
+    TAKTALK voice profile pointer. Often empty in practice (the empty
+    marker `<voice_profile_id/>` still signals TAKTALK origination), so
+    receivers should treat empty-but-present as the equivalent of the
+    marker rather than a missing field.
+    """
     def __init__(
         self,
         *,
@@ -1495,13 +1569,22 @@ class GeoChat(google.protobuf.message.Message):
         to_callsign: builtins.str | None = ...,
         receipt_for_uid: builtins.str = ...,
         receipt_type: global___GeoChat.ReceiptType.ValueType = ...,
+        lang: builtins.str | None = ...,
+        room_id: builtins.str | None = ...,
+        voice_profile_id: builtins.str | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["_to", b"_to", "_to_callsign", b"_to_callsign", "to", b"to", "to_callsign", b"to_callsign"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["_to", b"_to", "_to_callsign", b"_to_callsign", "message", b"message", "receipt_for_uid", b"receipt_for_uid", "receipt_type", b"receipt_type", "to", b"to", "to_callsign", b"to_callsign"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["_lang", b"_lang", "_room_id", b"_room_id", "_to", b"_to", "_to_callsign", b"_to_callsign", "_voice_profile_id", b"_voice_profile_id", "lang", b"lang", "room_id", b"room_id", "to", b"to", "to_callsign", b"to_callsign", "voice_profile_id", b"voice_profile_id"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["_lang", b"_lang", "_room_id", b"_room_id", "_to", b"_to", "_to_callsign", b"_to_callsign", "_voice_profile_id", b"_voice_profile_id", "lang", b"lang", "message", b"message", "receipt_for_uid", b"receipt_for_uid", "receipt_type", b"receipt_type", "room_id", b"room_id", "to", b"to", "to_callsign", b"to_callsign", "voice_profile_id", b"voice_profile_id"]) -> None: ...
+    @typing.overload
+    def WhichOneof(self, oneof_group: typing.Literal["_lang", b"_lang"]) -> typing.Literal["lang"] | None: ...
+    @typing.overload
+    def WhichOneof(self, oneof_group: typing.Literal["_room_id", b"_room_id"]) -> typing.Literal["room_id"] | None: ...
     @typing.overload
     def WhichOneof(self, oneof_group: typing.Literal["_to", b"_to"]) -> typing.Literal["to"] | None: ...
     @typing.overload
     def WhichOneof(self, oneof_group: typing.Literal["_to_callsign", b"_to_callsign"]) -> typing.Literal["to_callsign"] | None: ...
+    @typing.overload
+    def WhichOneof(self, oneof_group: typing.Literal["_voice_profile_id", b"_voice_profile_id"]) -> typing.Literal["voice_profile_id"] | None: ...
 
 global___GeoChat = GeoChat
 
@@ -1951,7 +2034,8 @@ class DrawnShape(google.protobuf.message.Message):
     FILL_COLOR_FIELD_NUMBER: builtins.int
     FILL_ARGB_FIELD_NUMBER: builtins.int
     LABELS_ON_FIELD_NUMBER: builtins.int
-    VERTICES_FIELD_NUMBER: builtins.int
+    VERTEX_LAT_DELTAS_FIELD_NUMBER: builtins.int
+    VERTEX_LON_DELTAS_FIELD_NUMBER: builtins.int
     TRUNCATED_FIELD_NUMBER: builtins.int
     BULLSEYE_DISTANCE_DM_FIELD_NUMBER: builtins.int
     BULLSEYE_BEARING_REF_FIELD_NUMBER: builtins.int
@@ -2012,7 +2096,7 @@ class DrawnShape(google.protobuf.message.Message):
     """
     truncated: builtins.bool
     """
-    True if the sender truncated `vertices` to fit the pool.
+    True if the sender truncated the vertex columns to fit the pool.
     --- Bullseye-only fields. All ignored unless kind == Kind_Bullseye. ---
     """
     bullseye_distance_dm: builtins.int
@@ -2036,13 +2120,9 @@ class DrawnShape(google.protobuf.message.Message):
     Bullseye reference UID (anchor marker). Empty = anchor is self.
     """
     @property
-    def vertices(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___CotGeoPoint]:
-        """
-        Vertex list for polyline/polygon/rectangle shapes. Capped at 32 by
-        the nanopb pool; senders MUST truncate longer inputs and set
-        `truncated = true`.
-        """
-
+    def vertex_lat_deltas(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.int]: ...
+    @property
+    def vertex_lon_deltas(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.int]: ...
     def __init__(
         self,
         *,
@@ -2057,14 +2137,15 @@ class DrawnShape(google.protobuf.message.Message):
         fill_color: global___Team.ValueType = ...,
         fill_argb: builtins.int = ...,
         labels_on: builtins.bool = ...,
-        vertices: collections.abc.Iterable[global___CotGeoPoint] | None = ...,
+        vertex_lat_deltas: collections.abc.Iterable[builtins.int] | None = ...,
+        vertex_lon_deltas: collections.abc.Iterable[builtins.int] | None = ...,
         truncated: builtins.bool = ...,
         bullseye_distance_dm: builtins.int = ...,
         bullseye_bearing_ref: builtins.int = ...,
         bullseye_flags: builtins.int = ...,
         bullseye_uid_ref: builtins.str = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing.Literal["angle_deg", b"angle_deg", "bullseye_bearing_ref", b"bullseye_bearing_ref", "bullseye_distance_dm", b"bullseye_distance_dm", "bullseye_flags", b"bullseye_flags", "bullseye_uid_ref", b"bullseye_uid_ref", "fill_argb", b"fill_argb", "fill_color", b"fill_color", "kind", b"kind", "labels_on", b"labels_on", "major_cm", b"major_cm", "minor_cm", b"minor_cm", "stroke_argb", b"stroke_argb", "stroke_color", b"stroke_color", "stroke_weight_x10", b"stroke_weight_x10", "style", b"style", "truncated", b"truncated", "vertices", b"vertices"]) -> None: ...
+    def ClearField(self, field_name: typing.Literal["angle_deg", b"angle_deg", "bullseye_bearing_ref", b"bullseye_bearing_ref", "bullseye_distance_dm", b"bullseye_distance_dm", "bullseye_flags", b"bullseye_flags", "bullseye_uid_ref", b"bullseye_uid_ref", "fill_argb", b"fill_argb", "fill_color", b"fill_color", "kind", b"kind", "labels_on", b"labels_on", "major_cm", b"major_cm", "minor_cm", b"minor_cm", "stroke_argb", b"stroke_argb", "stroke_color", b"stroke_color", "stroke_weight_x10", b"stroke_weight_x10", "style", b"style", "truncated", b"truncated", "vertex_lat_deltas", b"vertex_lat_deltas", "vertex_lon_deltas", b"vertex_lon_deltas"]) -> None: ...
 
 global___DrawnShape = DrawnShape
 
@@ -2714,7 +2795,6 @@ class CasevacReport(google.protobuf.message.Message):
     non_us_military: builtins.int
     non_us_civilian: builtins.int
     epw: builtins.int
-    """enemy prisoner of war"""
     child: builtins.int
     terrain_flags: builtins.int
     """
@@ -3288,6 +3368,163 @@ class SensorFov(google.protobuf.message.Message):
 global___SensorFov = SensorFov
 
 @typing.final
+class TakTalkMessage(google.protobuf.message.Message):
+    """
+    TAKTALK chat message payload (CoT type m-t-t).
+
+    TAKTALK is an ATAK plugin for voice + text team messaging. The voice
+    audio stream goes over UDP/RTP and is NOT carried by the mesh — only
+    the text envelope (this message) is. `from_voice` marks messages sent
+    via push-to-talk speech-to-text so receivers can render a mic icon
+    next to the text.
+
+    Wire shape inside <event type="m-t-t">/<detail>:
+      <callsign>...</callsign>        - mapped to TAKPacketV2.callsign
+      <lang>English</lang>            - lang
+      <text>...</text>                - text
+      <chatroom-id>1</chatroom-id>    - chatroom_id
+      <voice/>                        - presence sets from_voice = true
+    """
+
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    TEXT_FIELD_NUMBER: builtins.int
+    CHATROOM_ID_FIELD_NUMBER: builtins.int
+    LANG_FIELD_NUMBER: builtins.int
+    FROM_VOICE_FIELD_NUMBER: builtins.int
+    text: builtins.str
+    """
+    The text body of the TAKTALK message (speech-to-text transcript when
+    from_voice = true, typed message otherwise).
+    """
+    chatroom_id: builtins.str
+    """
+    TAKTALK chatroom identifier. May be a short id like "1" for the
+    default room or a UUID like "30b2755c-c547-44ef-a0cc-cdbd8a15616f"
+    for custom rooms (resolved by TakTalkRoomData broadcasts).
+    Empty = broadcast room.
+    """
+    lang: builtins.str
+    """
+    BCP-47-ish language tag or human-readable name (e.g. "en", "English").
+    Empty = unspecified.
+    """
+    from_voice: builtins.bool
+    """
+    True when the source CoT carried a <voice/> marker, i.e. the message
+    originated as push-to-talk speech-to-text. Lets receivers show a mic
+    icon. Proto3 only encodes when true so empty payload cost is 0 bytes.
+    """
+    def __init__(
+        self,
+        *,
+        text: builtins.str = ...,
+        chatroom_id: builtins.str = ...,
+        lang: builtins.str = ...,
+        from_voice: builtins.bool = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing.Literal["chatroom_id", b"chatroom_id", "from_voice", b"from_voice", "lang", b"lang", "text", b"text"]) -> None: ...
+
+global___TakTalkMessage = TakTalkMessage
+
+@typing.final
+class TakTalkRoomData(google.protobuf.message.Message):
+    """
+    TAKTALK room/membership broadcast (CoT type y-).
+
+    Announces a TAKTALK chatroom's friendly name and roster so peers can
+    resolve room UUIDs (used in TakTalkMessage.chatroom_id and
+    GeoChat.room_id) to a display name and participant list. Not a chat
+    message itself — these events are emitted by TAKTALK when rooms are
+    created or memberships change.
+    """
+
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    SENDER_CALLSIGN_FIELD_NUMBER: builtins.int
+    ROOM_ID_FIELD_NUMBER: builtins.int
+    ROOM_NAME_FIELD_NUMBER: builtins.int
+    PARTICIPANTS_FIELD_NUMBER: builtins.int
+    sender_callsign: builtins.str
+    """
+    Callsign of the device broadcasting the room state (typically the
+    room owner / latest writer).
+
+    DEPRECATED in v0.3.2: always equals TAKPacketV2.callsign, so the wire
+    byte was redundant. Builders stop emitting this field in v0.3.2;
+    parsers still read it for one release so v0.3.1-encoded packets decode
+    cleanly. To be removed entirely in v0.4.x.
+    """
+    room_id: builtins.str
+    """
+    Room UUID, matches TakTalkMessage.chatroom_id / GeoChat.room_id on
+    messages routed into this room.
+    """
+    room_name: builtins.str
+    """
+    Friendly display name for the room (e.g. "test", "Alpha Team").
+    """
+    @property
+    def participants(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.str]:
+        """
+        Member callsigns. Wire-encoded as repeated strings; the underlying
+        CoT carries them as a single <chatroom-participants>A,B,C</> element
+        which parsers split / builders join on ','.
+        """
+
+    def __init__(
+        self,
+        *,
+        sender_callsign: builtins.str = ...,
+        room_id: builtins.str = ...,
+        room_name: builtins.str = ...,
+        participants: collections.abc.Iterable[builtins.str] | None = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing.Literal["participants", b"participants", "room_id", b"room_id", "room_name", b"room_name", "sender_callsign", b"sender_callsign"]) -> None: ...
+
+global___TakTalkRoomData = TakTalkRoomData
+
+@typing.final
+class Marti(google.protobuf.message.Message):
+    """
+    ATAK directed-routing recipient list (CoT <marti><dest callsign='X'/>…</marti>).
+
+    Present when an event is addressed to specific TAK users rather than the
+    broadcast group. TAKTALK gates voice TTS on this element matching the
+    receiver's callsign; directed b-t-f chats use it for the same purpose. A
+    missing <marti> means "broadcast to all peers", which is the default for
+    PLI, alerts, drawings, and most situational-awareness events.
+
+    Carried as repeated strings (not indexes into a per-packet table) because
+    the typical event has 1-2 destinations and table overhead would erase the
+    savings. Receivers that need the original XML element rebuild it from
+    dest_callsign on emit.
+    """
+
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    DEST_CALLSIGN_FIELD_NUMBER: builtins.int
+    @property
+    def dest_callsign(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.str]:
+        """
+        Recipient callsigns. Order is preserved end-to-end so receivers can show
+        primary-vs-cc distinction the same way ATAK does.
+
+        If dest_callsign is [TAKPacketV2.callsign] (self-addressed, unusual but
+        legal — e.g. ATAK echoing back to its own room), the builder still emits
+        the element so loopback shapes round-trip cleanly.
+        """
+
+    def __init__(
+        self,
+        *,
+        dest_callsign: collections.abc.Iterable[builtins.str] | None = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing.Literal["dest_callsign", b"dest_callsign"]) -> None: ...
+
+global___Marti = Marti
+
+@typing.final
 class TAKPacketV2(google.protobuf.message.Message):
     """
     ATAK v2 packet with expanded CoT field support and zstd dictionary compression.
@@ -3324,7 +3561,7 @@ class TAKPacketV2(google.protobuf.message.Message):
     REMARKS_FIELD_NUMBER: builtins.int
     ENVIRONMENT_FIELD_NUMBER: builtins.int
     SENSOR_FOV_FIELD_NUMBER: builtins.int
-    PLI_FIELD_NUMBER: builtins.int
+    MARTI_FIELD_NUMBER: builtins.int
     CHAT_FIELD_NUMBER: builtins.int
     AIRCRAFT_FIELD_NUMBER: builtins.int
     RAW_DETAIL_FIELD_NUMBER: builtins.int
@@ -3335,6 +3572,8 @@ class TAKPacketV2(google.protobuf.message.Message):
     CASEVAC_FIELD_NUMBER: builtins.int
     EMERGENCY_FIELD_NUMBER: builtins.int
     TASK_FIELD_NUMBER: builtins.int
+    TAKTALK_FIELD_NUMBER: builtins.int
+    TAKTALK_ROOM_FIELD_NUMBER: builtins.int
     cot_type_id: global___CotType.ValueType
     """
     Well-known CoT event type enum.
@@ -3366,7 +3605,14 @@ class TAKPacketV2(google.protobuf.message.Message):
     """
     altitude: builtins.int
     """
-    Altitude in meters (HAE)
+    Altitude in meters (HAE). ATAK's "no altitude" sentinel is hae=9999999.0.
+
+    NOTE: an earlier v0.4.0 attempt made this `optional` to omit the 9999999
+    sentinel from the wire, but measurement showed it was net-negative: the
+    zstd dictionary already compresses the literal 9999999 to ~nothing, while
+    proto3 `optional` forces a genuine 0 m HAE (common on routes/drawings that
+    carry hae="0.0" or omit hae → parsed as 0) to encode explicitly (+2 bytes),
+    which REGRESSED the worst-case route fixture. Kept as a plain field.
     """
     speed: builtins.int
     """
@@ -3436,10 +3682,6 @@ class TAKPacketV2(google.protobuf.message.Message):
     GeoChat messages carry their text in GeoChat.message instead.
     Empty string (proto3 default) means no remarks were present.
     """
-    pli: builtins.bool
-    """
-    Position report (true = PLI, no extra fields beyond the common ones above)
-    """
     raw_detail: builtins.bytes
     """
     Generic CoT detail XML for unmapped types. Kept as a fallback for CoT
@@ -3465,6 +3707,19 @@ class TAKPacketV2(google.protobuf.message.Message):
     def sensor_fov(self) -> global___SensorFov:
         """
         Sensor field-of-view cone (camera, FLIR, laser, etc.). From <sensor>.
+        """
+
+    @property
+    def marti(self) -> global___Marti:
+        """
+        Directed-routing recipient list (CoT <marti><dest callsign='X'/>…</marti>).
+        Empty / unset = broadcast to all peers (the default for situational-awareness
+        events). Populated for TAKTALK m-t-t, directed b-t-f DMs, and any other CoT
+        shape that ATAK addresses to specific recipients. TAKTALK gates voice TTS
+        playback on this element matching the receiver's callsign, so dropping it
+        silently breaks voice messaging end-to-end.
+
+        See Marti.
         """
 
     @property
@@ -3523,6 +3778,22 @@ class TAKPacketV2(google.protobuf.message.Message):
         Task / engage request. See TaskRequest.
         """
 
+    @property
+    def taktalk(self) -> global___TakTalkMessage:
+        """
+        TAKTALK chat message (CoT type m-t-t). See TakTalkMessage.
+        Voice audio itself rides UDP/RTP outside the mesh; this carries the
+        text envelope plus a from_voice marker for receiver UX.
+        """
+
+    @property
+    def taktalk_room(self) -> global___TakTalkRoomData:
+        """
+        TAKTALK room/membership broadcast (CoT type y-). See TakTalkRoomData.
+        Resolves room UUIDs (used in TakTalkMessage.chatroom_id and
+        GeoChat.room_id) to display name + roster on receivers.
+        """
+
     def __init__(
         self,
         *,
@@ -3552,7 +3823,7 @@ class TAKPacketV2(google.protobuf.message.Message):
         remarks: builtins.str = ...,
         environment: global___TAKEnvironment | None = ...,
         sensor_fov: global___SensorFov | None = ...,
-        pli: builtins.bool = ...,
+        marti: global___Marti | None = ...,
         chat: global___GeoChat | None = ...,
         aircraft: global___AircraftTrack | None = ...,
         raw_detail: builtins.bytes = ...,
@@ -3563,14 +3834,18 @@ class TAKPacketV2(google.protobuf.message.Message):
         casevac: global___CasevacReport | None = ...,
         emergency: global___EmergencyAlert | None = ...,
         task: global___TaskRequest | None = ...,
+        taktalk: global___TakTalkMessage | None = ...,
+        taktalk_room: global___TakTalkRoomData | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["_environment", b"_environment", "_sensor_fov", b"_sensor_fov", "aircraft", b"aircraft", "casevac", b"casevac", "chat", b"chat", "emergency", b"emergency", "environment", b"environment", "marker", b"marker", "payload_variant", b"payload_variant", "pli", b"pli", "rab", b"rab", "raw_detail", b"raw_detail", "route", b"route", "sensor_fov", b"sensor_fov", "shape", b"shape", "task", b"task"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["_environment", b"_environment", "_sensor_fov", b"_sensor_fov", "aircraft", b"aircraft", "alt_src", b"alt_src", "altitude", b"altitude", "battery", b"battery", "callsign", b"callsign", "casevac", b"casevac", "chat", b"chat", "cot_type_id", b"cot_type_id", "cot_type_str", b"cot_type_str", "course", b"course", "device_callsign", b"device_callsign", "emergency", b"emergency", "endpoint", b"endpoint", "environment", b"environment", "geo_src", b"geo_src", "how", b"how", "latitude_i", b"latitude_i", "longitude_i", b"longitude_i", "marker", b"marker", "payload_variant", b"payload_variant", "phone", b"phone", "pli", b"pli", "rab", b"rab", "raw_detail", b"raw_detail", "remarks", b"remarks", "role", b"role", "route", b"route", "sensor_fov", b"sensor_fov", "shape", b"shape", "speed", b"speed", "stale_seconds", b"stale_seconds", "tak_device", b"tak_device", "tak_os", b"tak_os", "tak_platform", b"tak_platform", "tak_version", b"tak_version", "task", b"task", "team", b"team", "uid", b"uid"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["_environment", b"_environment", "_marti", b"_marti", "_sensor_fov", b"_sensor_fov", "aircraft", b"aircraft", "casevac", b"casevac", "chat", b"chat", "emergency", b"emergency", "environment", b"environment", "marker", b"marker", "marti", b"marti", "payload_variant", b"payload_variant", "rab", b"rab", "raw_detail", b"raw_detail", "route", b"route", "sensor_fov", b"sensor_fov", "shape", b"shape", "taktalk", b"taktalk", "taktalk_room", b"taktalk_room", "task", b"task"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["_environment", b"_environment", "_marti", b"_marti", "_sensor_fov", b"_sensor_fov", "aircraft", b"aircraft", "alt_src", b"alt_src", "altitude", b"altitude", "battery", b"battery", "callsign", b"callsign", "casevac", b"casevac", "chat", b"chat", "cot_type_id", b"cot_type_id", "cot_type_str", b"cot_type_str", "course", b"course", "device_callsign", b"device_callsign", "emergency", b"emergency", "endpoint", b"endpoint", "environment", b"environment", "geo_src", b"geo_src", "how", b"how", "latitude_i", b"latitude_i", "longitude_i", b"longitude_i", "marker", b"marker", "marti", b"marti", "payload_variant", b"payload_variant", "phone", b"phone", "rab", b"rab", "raw_detail", b"raw_detail", "remarks", b"remarks", "role", b"role", "route", b"route", "sensor_fov", b"sensor_fov", "shape", b"shape", "speed", b"speed", "stale_seconds", b"stale_seconds", "tak_device", b"tak_device", "tak_os", b"tak_os", "tak_platform", b"tak_platform", "tak_version", b"tak_version", "taktalk", b"taktalk", "taktalk_room", b"taktalk_room", "task", b"task", "team", b"team", "uid", b"uid"]) -> None: ...
     @typing.overload
     def WhichOneof(self, oneof_group: typing.Literal["_environment", b"_environment"]) -> typing.Literal["environment"] | None: ...
     @typing.overload
+    def WhichOneof(self, oneof_group: typing.Literal["_marti", b"_marti"]) -> typing.Literal["marti"] | None: ...
+    @typing.overload
     def WhichOneof(self, oneof_group: typing.Literal["_sensor_fov", b"_sensor_fov"]) -> typing.Literal["sensor_fov"] | None: ...
     @typing.overload
-    def WhichOneof(self, oneof_group: typing.Literal["payload_variant", b"payload_variant"]) -> typing.Literal["pli", "chat", "aircraft", "raw_detail", "shape", "marker", "rab", "route", "casevac", "emergency", "task"] | None: ...
+    def WhichOneof(self, oneof_group: typing.Literal["payload_variant", b"payload_variant"]) -> typing.Literal["chat", "aircraft", "raw_detail", "shape", "marker", "rab", "route", "casevac", "emergency", "task", "taktalk", "taktalk_room"] | None: ...
 
 global___TAKPacketV2 = TAKPacketV2

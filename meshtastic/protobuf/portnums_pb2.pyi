@@ -135,6 +135,13 @@ class _PortNumEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTy
     This module allows setting an extra string of status for a node.
     Broadcasts on change and on a timer, possibly once a day.
     """
+    MESH_BEACON_APP: _PortNum.ValueType  # 37
+    """
+    Beacon module broadcast packets.
+    ENCODING: protobuf
+    Periodically broadcast by nodes in beacon mode; received by nodes with MeshBeaconConfig.FLAG_LISTEN_ENABLED.
+    Carries a text message plus optional channel/preset offers for client apps.
+    """
     SERIAL_APP: _PortNum.ValueType  # 64
     """
     Provides a hardware serial interface to send and receive from the Meshtastic network.
@@ -377,6 +384,13 @@ Node Status module
 ENCODING: protobuf
 This module allows setting an extra string of status for a node.
 Broadcasts on change and on a timer, possibly once a day.
+"""
+MESH_BEACON_APP: PortNum.ValueType  # 37
+"""
+Beacon module broadcast packets.
+ENCODING: protobuf
+Periodically broadcast by nodes in beacon mode; received by nodes with MeshBeaconConfig.FLAG_LISTEN_ENABLED.
+Carries a text message plus optional channel/preset offers for client apps.
 """
 SERIAL_APP: PortNum.ValueType  # 64
 """

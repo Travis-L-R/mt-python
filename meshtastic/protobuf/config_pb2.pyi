@@ -1022,6 +1022,10 @@ class Config(google.protobuf.message.Message):
             """
             Can not be auto detected but set by proto. Used for 128x128 screens
             """
+            OLED_SH1107_ROTATED: Config.DisplayConfig._OledType.ValueType  # 5
+            """
+            Can not be auto detected but set by proto. Used for 64x128 rotated screens
+            """
 
         class OledType(_OledType, metaclass=_OledTypeEnumTypeWrapper):
             """
@@ -1047,6 +1051,10 @@ class Config(google.protobuf.message.Message):
         OLED_SH1107_128_128: Config.DisplayConfig.OledType.ValueType  # 4
         """
         Can not be auto detected but set by proto. Used for 128x128 screens
+        """
+        OLED_SH1107_ROTATED: Config.DisplayConfig.OledType.ValueType  # 5
+        """
+        Can not be auto detected but set by proto. Used for 64x128 rotated screens
         """
 
         class _DisplayMode:

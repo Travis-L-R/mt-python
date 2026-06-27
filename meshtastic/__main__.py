@@ -66,6 +66,14 @@ from meshtastic.version import get_active_version
 
 logger = logging.getLogger(__name__)
 
+# Map dotted preference paths to the protobuf enum that defines their flags.
+# These fields are stored as uint32 bitmasks in the protobuf but have an
+# associated enum that names the individual flags.
+BITFIELD_ENUMS = {
+    "network.enabled_protocols": config_pb2.Config.NetworkConfig.ProtocolFlags,
+    "position.position_flags": config_pb2.Config.PositionConfig.PositionFlags,
+}
+
 def onReceive(packet, interface) -> None:
     """Callback invoked when a packet arrives"""
     args = mt_config.args
@@ -86,12 +94,17 @@ def onReceive(packet, interface) -> None:
         if d is not None and args and args.reply:
             msg = d.get("text")
             if msg:
-                rxSnr = packet["rxSnr"]
-                hopLimit = packet["hopLimit"]
-                print(f"message: {msg}")
-                reply = f"got msg '{msg}' with rxSnr: {rxSnr} and hopLimit: {hopLimit}"
-                print("Sending reply: ", reply)
-                interface.sendText(reply)
+                rxChannel = packet.get("channel", 0)
+                targetChannel = int(args.ch_index or 0)
+                if rxChannel == targetChannel:
+                    rxSnr = packet["rxSnr"]
+                    hopLimit = packet["hopLimit"]
+                    print(f"message: {msg}")
+                    reply = f"got msg '{msg}' with rxSnr: {rxSnr} and hopLimit: {hopLimit}"
+                    print(f"Received channel {rxChannel}. Sending reply: {reply}")
+                    interface.sendText(reply,channelIndex=rxChannel)
+                else:
+                    print(f"Ignored message on channel {rxChannel} (waiting for channel {targetChannel})")
 
     except Exception as ex:
         print(f"Warning: Error processing received packet: {ex}.")
@@ -277,12 +290,34 @@ def setPref(config, comp_name, raw_val) -> bool:
         return False
 
     enumType = field_descriptor.enum_type
+
+    """
+    Todo: review code below introduced upstream:
+
+    # Handle uint32 bitfields that have an associated enum of flag names.
+    bitfield_enum = None
+    if config_type.message_type is not None:
+        bitfield_path = f"{config_type.name}.{pref.name}"
+        bitfield_enum = BITFIELD_ENUMS.get(bitfield_path)
+    if bitfield_enum and isinstance(val, str):
+        # At this point fromStr() could not parse val as int/float/bool/bytes,
+        # so treat it as a comma-separated list of bitfield flag names.
+        flag_names = [name.strip() for name in val.split(",") if name.strip()]
+        try:
+            val = meshtastic.util.flags_from_list(bitfield_enum, flag_names)
+        except ValueError as e:
+            print(f"ERROR: {e}")
+            return False
+
+    enumType = pref.enum_type
+    """
+
     # pylint: disable=C0123
     if enumType and type(val) == str:
         # We've failed so far to convert this string into an enum, try to find it by reflection
-        e = enumType.values_by_name.get(val)
-        if e:
-            val = e.number
+        ev = enumType.values_by_name.get(val)
+        if ev:
+            val = ev.number
         else:
             print(
                 f"{name[0]}.{uni_name} does not have an enum called {val}, so you can not set it."
@@ -594,6 +629,13 @@ def onConnected(interface):
             closeNow = True
             waitForAckNak = True
             interface.getNode(args.dest, False, **getNode_kwargs).resetNodeDb()
+
+        if args.add_contact:
+            closeNow = True
+            waitForAckNak = True
+            interface.getNode(args.dest, False, **getNode_kwargs).addContactURL(
+                args.add_contact
+            )
 
         if args.sendtext:
             closeNow = True
@@ -1164,6 +1206,20 @@ def onConnected(interface):
             else:
                 print("Install pyqrcode to view a QR code printed to terminal.")
 
+        if args.contact_qr:
+            closeNow = True
+            url = interface.getNode(args.dest, True, **getNode_kwargs).getContactURL(
+                args.contact_qr,
+                should_ignore=args.contact_ignore,
+                manually_verified=args.contact_verified,
+            )
+            print(f"Contact URL: {url}")
+            if pyqrcode is not None:
+                qr = pyqrcode.create(url)
+                print(qr.terminal())
+            else:
+                print("Install pyqrcode to view a QR code printed to terminal.")
+
         log_set: Optional = None  # type: ignore[annotation-unchecked]
         # we need to keep a reference to the logset so it doesn't get GCed early
 
@@ -1456,6 +1512,11 @@ def common():
             if not stripped_ham_name:
                 meshtastic.util.our_exit("ERROR: Ham radio callsign cannot be empty or contain only whitespace characters")
 
+        # Early validation for OTA firmware file before attempting device connection
+        if hasattr(args, 'ota_update') and args.ota_update is not None:
+            if not os.path.isfile(args.ota_update):
+                meshtastic.util.our_exit(f"Error: OTA firmware file not found: {args.ota_update}", 1)
+
         if have_powermon:
             create_power_meter()
 
@@ -1508,13 +1569,59 @@ def common():
                     print(f"Found: name='{x.name}' address='{x.address}'")
                 meshtastic.util.our_exit("BLE scan finished", 0)
             elif args.ble:
-                client = BLEInterface(
-                    args.ble if args.ble != "any" else None,
-                    debugOut=logfile,
-                    noProto=args.noproto,
-                    noNodes=args.no_nodes,
-                    timeout=args.timeout,
-                )
+                try:
+                    client = BLEInterface(
+                        args.ble if args.ble != "any" else None,
+                        debugOut=logfile,
+                        noProto=args.noproto,
+                        noNodes=args.no_nodes,
+                        timeout=args.timeout,
+                    )
+                except BLEInterface.BLEError as e:
+                    if e.kind == BLEInterface.BLEError.DEVICE_NOT_FOUND:
+                        meshtastic.util.our_exit(
+                            "BLE device not found.\n\n"
+                            "Possible causes:\n"
+                            "  - Bluetooth is disabled on the Meshtastic device\n"
+                            "  - Device is in deep sleep mode\n"
+                            "  - Device is out of range\n\n"
+                            "Try:\n"
+                            "  - Press the reset button on your device\n"
+                            "  - Run 'meshtastic --ble-scan' to see available devices",
+                            1,
+                        )
+                    elif e.kind == BLEInterface.BLEError.MULTIPLE_DEVICES:
+                        meshtastic.util.our_exit(
+                            "Multiple Meshtastic BLE devices found.\n\n"
+                            "Please specify which device to connect to:\n"
+                            "  - Run 'meshtastic --ble-scan' to list devices\n"
+                            "  - Use 'meshtastic --ble <name_or_address>' to connect",
+                            1,
+                        )
+                    elif e.kind == BLEInterface.BLEError.WRITE_ERROR:
+                        meshtastic.util.our_exit(
+                            "Failed to write to BLE device.\n\n"
+                            "Possible causes:\n"
+                            "  - Device requires pairing PIN (check device screen)\n"
+                            "  - On Linux: user not in 'bluetooth' group\n"
+                            "  - Connection was interrupted\n\n"
+                            "Try:\n"
+                            "  - Restart Bluetooth on your computer\n"
+                            "  - Reset the Meshtastic device",
+                            1,
+                        )
+                    elif e.kind == BLEInterface.BLEError.READ_ERROR:
+                        meshtastic.util.our_exit(
+                            "Failed to read from BLE device.\n\n"
+                            "The device may have disconnected unexpectedly.\n\n"
+                            "Try:\n"
+                            "  - Move closer to the device\n"
+                            "  - Reset the Meshtastic device\n"
+                            "  - Restart Bluetooth on your computer",
+                            1,
+                        )
+                    else:
+                        meshtastic.util.our_exit(f"BLE error: {e}", 1)
             elif args.host:
                 try:
                     if ":" in args.host:
@@ -1570,6 +1677,23 @@ def common():
                     message += "  Please close any applications or webpages that may be using the device and try again.\n"
                     message += f"\nOriginal error: {ex}"
                     meshtastic.util.our_exit(message)
+                except MeshInterface.MeshInterfaceError as ex:
+                    msg = str(ex)
+                    if "Timed out" in msg:
+                        meshtastic.util.our_exit(
+                            "Connection timed out.\n\n"
+                            "Possible causes:\n"
+                            "  - Device is rebooting\n"
+                            "  - Device firmware is updating\n"
+                            "  - Serial connection was interrupted\n\n"
+                            "Try:\n"
+                            "  - Wait a few seconds and try again\n"
+                            "  - Check if device is fully booted (LED patterns)\n"
+                            "  - Reconnect the USB cable",
+                            1,
+                        )
+                    else:
+                        meshtastic.util.our_exit(f"Connection error: {ex}", 1)
                 if client.devPath is None:
                     try:
                         client = meshtastic.tcp_interface.TCPInterface(
@@ -1626,10 +1750,12 @@ def addConnectionArgs(parser: argparse.ArgumentParser) -> argparse.ArgumentParse
         "--host",
         "--tcp",
         "-t",
-        help="Connect to a device using TCP, optionally passing hostname or IP address to use. (defaults to '%(const)s')",
+        help=("Connect to a device using TCP, optionally passing hostname or IP address to use. (defaults to '%(const)s'). "
+              "A port number may be specified as well, e.g. meshtastic.local:4404. The default port is 4403."),
         nargs="?",
         default=None,
         const="localhost",
+        metavar="HOST[:PORT]",
     )
 
     group.add_argument(
@@ -1901,6 +2027,24 @@ def addChannelConfigArgs(parser: argparse.ArgumentParser) -> argparse.ArgumentPa
     )
 
     group.add_argument(
+        "--contact-qr",
+        help="Display a QR code for a node's contact data. "
+        "Use the node ID with a '!' or '0x' prefix or the node number. "
+        "Also shows the shareable contact URL.",
+        metavar="!xxxxxxxx",
+    )
+    group.add_argument(
+        "--contact-verified",
+        help="Set the IS_KEY_MANUALLY_VERIFIED bit in the generated contact URL",
+        action="store_true",
+    )
+    group.add_argument(
+        "--contact-ignore",
+        help="Mark this contact as blocked/ignored in the generated contact URL",
+        action="store_true",
+    )
+
+    group.add_argument(
         "--ch-enable",
         help="Enable the specified channel. Use --ch-add instead whenever possible.",
         action="store_true",
@@ -2020,7 +2164,8 @@ def addPositionConfigArgs(parser: argparse.ArgumentParser) -> argparse.ArgumentP
 
     group.add_argument(
         "--pos-fields",
-        help="Specify fields to send when sending a position. Use no argument for a list of valid values. "
+        help="Deprecated: use '--set position.position_flags FLAG1,FLAG2' instead. "
+        "Specify fields to send when sending a position. Use no argument for a list of valid values. "
         "Can pass multiple values as a space separated list like "
         "this: '--pos-fields ALTITUDE HEADING SPEED'",
         nargs="*",
@@ -2105,7 +2250,10 @@ def addRemoteActionArgs(parser: argparse.ArgumentParser) -> argparse.ArgumentPar
     )
 
     group.add_argument(
-        "--reply", help="Reply to received messages", action="store_true"
+        "--reply",
+        help="Reply to received messages on the channel they were received. "
+        "If '--ch-index' is set, only messages on that channel are replied to.",
+        action="store_true",
     )
 
     return parser
@@ -2200,6 +2348,13 @@ def addRemoteAdminArgs(parser: argparse.ArgumentParser) -> argparse.ArgumentPars
         "--reset-nodedb",
         help="Tell the destination node to clear its list of nodes",
         action="store_true",
+    )
+
+    group.add_argument(
+        "--add-contact",
+        help="Add a contact (User) to the NodeDB from a shareable URL. "
+        "Example: https://meshtastic.org/v/#<base64>",
+        metavar="URL",
     )
 
     group.add_argument(

@@ -24,9 +24,10 @@ _sym_db = _symbol_database.Default()
 
 from meshtastic.protobuf import channel_pb2 as meshtastic_dot_protobuf_dot_channel__pb2
 from meshtastic.protobuf import lora_config_pb2 as meshtastic_dot_protobuf_dot_lora__config__pb2
+from meshtastic.protobuf import nanopb_pb2 as meshtastic_dot_protobuf_dot_nanopb__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n!meshtastic/protobuf/apponly.proto\x12\x13meshtastic.protobuf\x1a!meshtastic/protobuf/channel.proto\x1a%meshtastic/protobuf/lora_config.proto\"z\n\nChannelSet\x12\x36\n\x08settings\x18\x01 \x03(\x0b\x32$.meshtastic.protobuf.ChannelSettings\x12\x34\n\x0blora_config\x18\x02 \x01(\x0b\x32\x1f.meshtastic.protobuf.LoRaConfigBc\n\x14org.meshtastic.protoB\rAppOnlyProtosZ\"github.com/meshtastic/go/generated\xaa\x02\x14Meshtastic.Protobufs\xba\x02\x00\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n!meshtastic/protobuf/apponly.proto\x12\x13meshtastic.protobuf\x1a!meshtastic/protobuf/channel.proto\x1a%meshtastic/protobuf/lora_config.proto\x1a meshtastic/protobuf/nanopb.proto\"\x81\x01\n\nChannelSet\x12=\n\x08settings\x18\x01 \x03(\x0b\x32$.meshtastic.protobuf.ChannelSettingsB\x05\x92?\x02\x10\x08\x12\x34\n\x0blora_config\x18\x02 \x01(\x0b\x32\x1f.meshtastic.protobuf.LoRaConfigBc\n\x14org.meshtastic.protoB\rAppOnlyProtosZ\"github.com/meshtastic/go/generated\xaa\x02\x14Meshtastic.Protobufs\xba\x02\x00\x62\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -34,6 +35,8 @@ _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'meshtastic.protobuf.apponly
 if not _descriptor._USE_C_DESCRIPTORS:
   _globals['DESCRIPTOR']._loaded_options = None
   _globals['DESCRIPTOR']._serialized_options = b'\n\024org.meshtastic.protoB\rAppOnlyProtosZ\"github.com/meshtastic/go/generated\252\002\024Meshtastic.Protobufs\272\002\000'
-  _globals['_CHANNELSET']._serialized_start=132
-  _globals['_CHANNELSET']._serialized_end=254
+  _globals['_CHANNELSET'].fields_by_name['settings']._loaded_options = None
+  _globals['_CHANNELSET'].fields_by_name['settings']._serialized_options = b'\222?\002\020\010'
+  _globals['_CHANNELSET']._serialized_start=167
+  _globals['_CHANNELSET']._serialized_end=296
 # @@protoc_insertion_point(module_scope)

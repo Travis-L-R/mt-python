@@ -145,9 +145,9 @@ class LoRaConfig(google.protobuf.message.Message):
         """
         ITU Region 1 Amateur Radio 2m band (144-146 MHz)
         """
-        ITU23_2M: LoRaConfig._RegionCode.ValueType  # 28
+        ITU2_2M: LoRaConfig._RegionCode.ValueType  # 28
         """
-        ITU Region 2 / 3 Amateur Radio 2m band (144-148 MHz)
+        ITU Region 2 Amateur Radio 2m band (144-148 MHz)
         """
         EU_866: LoRaConfig._RegionCode.ValueType  # 29
         """
@@ -161,6 +161,31 @@ class LoRaConfig(google.protobuf.message.Message):
         EU_N_868: LoRaConfig._RegionCode.ValueType  # 32
         """
         EU 868MHz band, with narrow presets
+        """
+        ITU3_2M: LoRaConfig._RegionCode.ValueType  # 33
+        """
+        ITU Region 3 Amateur Radio 2m band (144-148 MHz)
+        """
+        ITU1_70CM: LoRaConfig._RegionCode.ValueType  # 34
+        """
+        ITU Region 1 Amateur Radio 70cm band (430-440 MHz)
+        """
+        ITU2_70CM: LoRaConfig._RegionCode.ValueType  # 35
+        """
+        ITU Region 2 Amateur Radio 70cm band (420-450 MHz)
+        Note: Some countries do not allocate 420-430 MHz or 440-450 MHz.
+        Check local law!
+        """
+        ITU3_70CM: LoRaConfig._RegionCode.ValueType  # 36
+        """
+        ITU Region 3 Amateur Radio 70cm band (430-450 MHz)
+        Note: Some countries do not allocate 440-450 MHz. Check local law!
+        """
+        ITU2_125CM: LoRaConfig._RegionCode.ValueType  # 37
+        """
+        ITU Region 2 Amateur Radio 1.25m '125cm' band (220-225 MHz)
+        Note: Some countries do not allocate 220-222 MHz (Ex: USA/Canada).
+        Check local law!
         """
 
     class RegionCode(_RegionCode, metaclass=_RegionCodeEnumTypeWrapper): ...
@@ -276,9 +301,9 @@ class LoRaConfig(google.protobuf.message.Message):
     """
     ITU Region 1 Amateur Radio 2m band (144-146 MHz)
     """
-    ITU23_2M: LoRaConfig.RegionCode.ValueType  # 28
+    ITU2_2M: LoRaConfig.RegionCode.ValueType  # 28
     """
-    ITU Region 2 / 3 Amateur Radio 2m band (144-148 MHz)
+    ITU Region 2 Amateur Radio 2m band (144-148 MHz)
     """
     EU_866: LoRaConfig.RegionCode.ValueType  # 29
     """
@@ -292,6 +317,31 @@ class LoRaConfig(google.protobuf.message.Message):
     EU_N_868: LoRaConfig.RegionCode.ValueType  # 32
     """
     EU 868MHz band, with narrow presets
+    """
+    ITU3_2M: LoRaConfig.RegionCode.ValueType  # 33
+    """
+    ITU Region 3 Amateur Radio 2m band (144-148 MHz)
+    """
+    ITU1_70CM: LoRaConfig.RegionCode.ValueType  # 34
+    """
+    ITU Region 1 Amateur Radio 70cm band (430-440 MHz)
+    """
+    ITU2_70CM: LoRaConfig.RegionCode.ValueType  # 35
+    """
+    ITU Region 2 Amateur Radio 70cm band (420-450 MHz)
+    Note: Some countries do not allocate 420-430 MHz or 440-450 MHz.
+    Check local law!
+    """
+    ITU3_70CM: LoRaConfig.RegionCode.ValueType  # 36
+    """
+    ITU Region 3 Amateur Radio 70cm band (430-450 MHz)
+    Note: Some countries do not allocate 440-450 MHz. Check local law!
+    """
+    ITU2_125CM: LoRaConfig.RegionCode.ValueType  # 37
+    """
+    ITU Region 2 Amateur Radio 1.25m '125cm' band (220-225 MHz)
+    Note: Some countries do not allocate 220-222 MHz (Ex: USA/Canada).
+    Check local law!
     """
 
     class _ModemPreset:
@@ -369,6 +419,24 @@ class LoRaConfig(google.protobuf.message.Message):
         Narrow Slow
         Moderate range preset optimized for EU 868MHz band with 62.5kHz bandwidth.
         Comparable link budget and data rate to LONG_FAST.
+        """
+        TINY_FAST: LoRaConfig._ModemPreset.ValueType  # 14
+        """
+        Tiny Fast
+        Preset optimized for compliance with Amateur Radio restrictions with 20kHz bandwidth.
+        Many regions limit data transmission bandwidth in lower amateur bands (2 Meter).
+        Note: TCXO with tight tolerances (±5 ppm or better) is *absolutely required* at these narrow bandwidths.
+        Only compatible with SX127x and SX126x chipsets.
+        Comparable link budget and data rate to LONG_FAST.
+        """
+        TINY_SLOW: LoRaConfig._ModemPreset.ValueType  # 15
+        """
+        Tiny Slow
+        Preset optimized for compliance with Amateur Radio restrictions with 20kHz bandwidth.
+        Many regions limit data transmission bandwidth in lower amateur bands (2 Meter).
+        Note: TCXO with tight tolerances (±5 ppm or better) is *absolutely required* at these narrow bandwidths.
+        Only compatible with SX127x and SX126x chipsets.
+        Comparable link budget and data rate to LONG_MODERATE.
         """
         NO_PRESET: LoRaConfig._ModemPreset.ValueType  # 255
         """
@@ -450,6 +518,24 @@ class LoRaConfig(google.protobuf.message.Message):
     Narrow Slow
     Moderate range preset optimized for EU 868MHz band with 62.5kHz bandwidth.
     Comparable link budget and data rate to LONG_FAST.
+    """
+    TINY_FAST: LoRaConfig.ModemPreset.ValueType  # 14
+    """
+    Tiny Fast
+    Preset optimized for compliance with Amateur Radio restrictions with 20kHz bandwidth.
+    Many regions limit data transmission bandwidth in lower amateur bands (2 Meter).
+    Note: TCXO with tight tolerances (±5 ppm or better) is *absolutely required* at these narrow bandwidths.
+    Only compatible with SX127x and SX126x chipsets.
+    Comparable link budget and data rate to LONG_FAST.
+    """
+    TINY_SLOW: LoRaConfig.ModemPreset.ValueType  # 15
+    """
+    Tiny Slow
+    Preset optimized for compliance with Amateur Radio restrictions with 20kHz bandwidth.
+    Many regions limit data transmission bandwidth in lower amateur bands (2 Meter).
+    Note: TCXO with tight tolerances (±5 ppm or better) is *absolutely required* at these narrow bandwidths.
+    Only compatible with SX127x and SX126x chipsets.
+    Comparable link budget and data rate to LONG_MODERATE.
     """
     NO_PRESET: LoRaConfig.ModemPreset.ValueType  # 255
     """

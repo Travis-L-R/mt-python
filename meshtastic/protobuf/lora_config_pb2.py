@@ -22,9 +22,10 @@ _runtime_version.ValidateProtobufRuntimeVersion(
 _sym_db = _symbol_database.Default()
 
 
+from meshtastic.protobuf import nanopb_pb2 as meshtastic_dot_protobuf_dot_nanopb__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n%meshtastic/protobuf/lora_config.proto\x12\x13meshtastic.protobuf\"\xa8\n\n\nLoRaConfig\x12\x12\n\nuse_preset\x18\x01 \x01(\x08\x12\x41\n\x0cmodem_preset\x18\x02 \x01(\x0e\x32+.meshtastic.protobuf.LoRaConfig.ModemPreset\x12\x11\n\tbandwidth\x18\x03 \x01(\r\x12\x15\n\rspread_factor\x18\x04 \x01(\r\x12\x13\n\x0b\x63oding_rate\x18\x05 \x01(\r\x12\x18\n\x10\x66requency_offset\x18\x06 \x01(\x02\x12:\n\x06region\x18\x07 \x01(\x0e\x32*.meshtastic.protobuf.LoRaConfig.RegionCode\x12\x11\n\thop_limit\x18\x08 \x01(\r\x12\x12\n\ntx_enabled\x18\t \x01(\x08\x12\x10\n\x08tx_power\x18\n \x01(\x05\x12\x13\n\x0b\x63hannel_num\x18\x0b \x01(\r\x12\x1b\n\x13override_duty_cycle\x18\x0c \x01(\x08\x12\x1e\n\x16sx126x_rx_boosted_gain\x18\r \x01(\x08\x12\x1a\n\x12override_frequency\x18\x0e \x01(\x02\x12\x17\n\x0fpa_fan_disabled\x18\x0f \x01(\x08\x12\x17\n\x0fignore_incoming\x18g \x03(\r\x12\x13\n\x0bignore_mqtt\x18h \x01(\x08\x12\x19\n\x11\x63onfig_ok_to_mqtt\x18i \x01(\x08\x12\x42\n\x0c\x66\x65m_lna_mode\x18j \x01(\x0e\x32,.meshtastic.protobuf.LoRaConfig.FEM_LNA_Mode\x12\x17\n\x0fserial_hal_only\x18k \x01(\x08\"\xfb\x02\n\nRegionCode\x12\t\n\x05UNSET\x10\x00\x12\x06\n\x02US\x10\x01\x12\n\n\x06\x45U_433\x10\x02\x12\n\n\x06\x45U_868\x10\x03\x12\x06\n\x02\x43N\x10\x04\x12\x06\n\x02JP\x10\x05\x12\x07\n\x03\x41NZ\x10\x06\x12\x06\n\x02KR\x10\x07\x12\x06\n\x02TW\x10\x08\x12\x06\n\x02RU\x10\t\x12\x06\n\x02IN\x10\n\x12\n\n\x06NZ_865\x10\x0b\x12\x06\n\x02TH\x10\x0c\x12\x0b\n\x07LORA_24\x10\r\x12\n\n\x06UA_433\x10\x0e\x12\n\n\x06UA_868\x10\x0f\x12\n\n\x06MY_433\x10\x10\x12\n\n\x06MY_919\x10\x11\x12\n\n\x06SG_923\x10\x12\x12\n\n\x06PH_433\x10\x13\x12\n\n\x06PH_868\x10\x14\x12\n\n\x06PH_915\x10\x15\x12\x0b\n\x07\x41NZ_433\x10\x16\x12\n\n\x06KZ_433\x10\x17\x12\n\n\x06KZ_863\x10\x18\x12\n\n\x06NP_865\x10\x19\x12\n\n\x06\x42R_902\x10\x1a\x12\x0b\n\x07ITU1_2M\x10\x1b\x12\x0c\n\x08ITU23_2M\x10\x1c\x12\n\n\x06\x45U_866\x10\x1d\x12\n\n\x06\x45U_874\x10\x1e\x12\n\n\x06\x45U_917\x10\x1f\x12\x0c\n\x08\x45U_N_868\x10 \"\x8d\x02\n\x0bModemPreset\x12\r\n\tLONG_FAST\x10\x00\x12\x11\n\tLONG_SLOW\x10\x01\x1a\x02\x08\x01\x12\x16\n\x0eVERY_LONG_SLOW\x10\x02\x1a\x02\x08\x01\x12\x0f\n\x0bMEDIUM_SLOW\x10\x03\x12\x0f\n\x0bMEDIUM_FAST\x10\x04\x12\x0e\n\nSHORT_SLOW\x10\x05\x12\x0e\n\nSHORT_FAST\x10\x06\x12\x11\n\rLONG_MODERATE\x10\x07\x12\x0f\n\x0bSHORT_TURBO\x10\x08\x12\x0e\n\nLONG_TURBO\x10\t\x12\r\n\tLITE_FAST\x10\n\x12\r\n\tLITE_SLOW\x10\x0b\x12\x0f\n\x0bNARROW_FAST\x10\x0c\x12\x0f\n\x0bNARROW_SLOW\x10\r\x12\x0e\n\tNO_PRESET\x10\xff\x01\":\n\x0c\x46\x45M_LNA_Mode\x12\x0c\n\x08\x44ISABLED\x10\x00\x12\x0b\n\x07\x45NABLED\x10\x01\x12\x0f\n\x0bNOT_PRESENT\x10\x02\"h\n\x0eLoRaConfigLite\x12\x41\n\x0cmodem_preset\x18\x01 \x01(\x0e\x32+.meshtastic.protobuf.LoRaConfig.ModemPreset\x12\x13\n\x0b\x63hannel_num\x18\x02 \x01(\rBa\n\x13\x63om.geeksville.meshB\x0c\x43onfigProtosZ\"github.com/meshtastic/go/generated\xaa\x02\x14Meshtastic.Protobufs\xba\x02\x00\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n%meshtastic/protobuf/lora_config.proto\x12\x13meshtastic.protobuf\x1a meshtastic/protobuf/nanopb.proto\"\xb2\x0b\n\nLoRaConfig\x12\x12\n\nuse_preset\x18\x01 \x01(\x08\x12\x41\n\x0cmodem_preset\x18\x02 \x01(\x0e\x32+.meshtastic.protobuf.LoRaConfig.ModemPreset\x12\x18\n\tbandwidth\x18\x03 \x01(\rB\x05\x92?\x02\x38\x10\x12\x15\n\rspread_factor\x18\x04 \x01(\r\x12\x1a\n\x0b\x63oding_rate\x18\x05 \x01(\rB\x05\x92?\x02\x38\x08\x12\x18\n\x10\x66requency_offset\x18\x06 \x01(\x02\x12:\n\x06region\x18\x07 \x01(\x0e\x32*.meshtastic.protobuf.LoRaConfig.RegionCode\x12\x11\n\thop_limit\x18\x08 \x01(\r\x12\x12\n\ntx_enabled\x18\t \x01(\x08\x12\x17\n\x08tx_power\x18\n \x01(\x05\x42\x05\x92?\x02\x38\x08\x12\x1a\n\x0b\x63hannel_num\x18\x0b \x01(\rB\x05\x92?\x02\x38\x10\x12\x1b\n\x13override_duty_cycle\x18\x0c \x01(\x08\x12\x1e\n\x16sx126x_rx_boosted_gain\x18\r \x01(\x08\x12\x1a\n\x12override_frequency\x18\x0e \x01(\x02\x12\x17\n\x0fpa_fan_disabled\x18\x0f \x01(\x08\x12\x1e\n\x0fignore_incoming\x18g \x03(\rB\x05\x92?\x02\x10\x03\x12\x13\n\x0bignore_mqtt\x18h \x01(\x08\x12\x19\n\x11\x63onfig_ok_to_mqtt\x18i \x01(\x08\x12\x42\n\x0c\x66\x65m_lna_mode\x18j \x01(\x0e\x32,.meshtastic.protobuf.LoRaConfig.FEM_LNA_Mode\x12\x17\n\x0fserial_hal_only\x18k \x01(\x08\"\xc4\x03\n\nRegionCode\x12\t\n\x05UNSET\x10\x00\x12\x06\n\x02US\x10\x01\x12\n\n\x06\x45U_433\x10\x02\x12\n\n\x06\x45U_868\x10\x03\x12\x06\n\x02\x43N\x10\x04\x12\x06\n\x02JP\x10\x05\x12\x07\n\x03\x41NZ\x10\x06\x12\x06\n\x02KR\x10\x07\x12\x06\n\x02TW\x10\x08\x12\x06\n\x02RU\x10\t\x12\x06\n\x02IN\x10\n\x12\n\n\x06NZ_865\x10\x0b\x12\x06\n\x02TH\x10\x0c\x12\x0b\n\x07LORA_24\x10\r\x12\n\n\x06UA_433\x10\x0e\x12\n\n\x06UA_868\x10\x0f\x12\n\n\x06MY_433\x10\x10\x12\n\n\x06MY_919\x10\x11\x12\n\n\x06SG_923\x10\x12\x12\n\n\x06PH_433\x10\x13\x12\n\n\x06PH_868\x10\x14\x12\n\n\x06PH_915\x10\x15\x12\x0b\n\x07\x41NZ_433\x10\x16\x12\n\n\x06KZ_433\x10\x17\x12\n\n\x06KZ_863\x10\x18\x12\n\n\x06NP_865\x10\x19\x12\n\n\x06\x42R_902\x10\x1a\x12\x0b\n\x07ITU1_2M\x10\x1b\x12\x0b\n\x07ITU2_2M\x10\x1c\x12\n\n\x06\x45U_866\x10\x1d\x12\n\n\x06\x45U_874\x10\x1e\x12\n\n\x06\x45U_917\x10\x1f\x12\x0c\n\x08\x45U_N_868\x10 \x12\x0b\n\x07ITU3_2M\x10!\x12\r\n\tITU1_70CM\x10\"\x12\r\n\tITU2_70CM\x10#\x12\r\n\tITU3_70CM\x10$\x12\x0e\n\nITU2_125CM\x10%\"\xab\x02\n\x0bModemPreset\x12\r\n\tLONG_FAST\x10\x00\x12\x11\n\tLONG_SLOW\x10\x01\x1a\x02\x08\x01\x12\x16\n\x0eVERY_LONG_SLOW\x10\x02\x1a\x02\x08\x01\x12\x0f\n\x0bMEDIUM_SLOW\x10\x03\x12\x0f\n\x0bMEDIUM_FAST\x10\x04\x12\x0e\n\nSHORT_SLOW\x10\x05\x12\x0e\n\nSHORT_FAST\x10\x06\x12\x11\n\rLONG_MODERATE\x10\x07\x12\x0f\n\x0bSHORT_TURBO\x10\x08\x12\x0e\n\nLONG_TURBO\x10\t\x12\r\n\tLITE_FAST\x10\n\x12\r\n\tLITE_SLOW\x10\x0b\x12\x0f\n\x0bNARROW_FAST\x10\x0c\x12\x0f\n\x0bNARROW_SLOW\x10\r\x12\r\n\tTINY_FAST\x10\x0e\x12\r\n\tTINY_SLOW\x10\x0f\x12\x0e\n\tNO_PRESET\x10\xff\x01\":\n\x0c\x46\x45M_LNA_Mode\x12\x0c\n\x08\x44ISABLED\x10\x00\x12\x0b\n\x07\x45NABLED\x10\x01\x12\x0f\n\x0bNOT_PRESENT\x10\x02\"o\n\x0eLoRaConfigLite\x12\x41\n\x0cmodem_preset\x18\x01 \x01(\x0e\x32+.meshtastic.protobuf.LoRaConfig.ModemPreset\x12\x1a\n\x0b\x63hannel_num\x18\x02 \x01(\rB\x05\x92?\x02\x38\x10\x42\x61\n\x13\x63om.geeksville.meshB\x0c\x43onfigProtosZ\"github.com/meshtastic/go/generated\xaa\x02\x14Meshtastic.Protobufs\xba\x02\x00\x62\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -36,14 +37,26 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_LORACONFIG_MODEMPRESET'].values_by_name["LONG_SLOW"]._serialized_options = b'\010\001'
   _globals['_LORACONFIG_MODEMPRESET'].values_by_name["VERY_LONG_SLOW"]._loaded_options = None
   _globals['_LORACONFIG_MODEMPRESET'].values_by_name["VERY_LONG_SLOW"]._serialized_options = b'\010\001'
-  _globals['_LORACONFIG']._serialized_start=63
-  _globals['_LORACONFIG']._serialized_end=1383
-  _globals['_LORACONFIG_REGIONCODE']._serialized_start=672
-  _globals['_LORACONFIG_REGIONCODE']._serialized_end=1051
-  _globals['_LORACONFIG_MODEMPRESET']._serialized_start=1054
-  _globals['_LORACONFIG_MODEMPRESET']._serialized_end=1323
-  _globals['_LORACONFIG_FEM_LNA_MODE']._serialized_start=1325
-  _globals['_LORACONFIG_FEM_LNA_MODE']._serialized_end=1383
-  _globals['_LORACONFIGLITE']._serialized_start=1385
-  _globals['_LORACONFIGLITE']._serialized_end=1489
+  _globals['_LORACONFIG'].fields_by_name['bandwidth']._loaded_options = None
+  _globals['_LORACONFIG'].fields_by_name['bandwidth']._serialized_options = b'\222?\0028\020'
+  _globals['_LORACONFIG'].fields_by_name['coding_rate']._loaded_options = None
+  _globals['_LORACONFIG'].fields_by_name['coding_rate']._serialized_options = b'\222?\0028\010'
+  _globals['_LORACONFIG'].fields_by_name['tx_power']._loaded_options = None
+  _globals['_LORACONFIG'].fields_by_name['tx_power']._serialized_options = b'\222?\0028\010'
+  _globals['_LORACONFIG'].fields_by_name['channel_num']._loaded_options = None
+  _globals['_LORACONFIG'].fields_by_name['channel_num']._serialized_options = b'\222?\0028\020'
+  _globals['_LORACONFIG'].fields_by_name['ignore_incoming']._loaded_options = None
+  _globals['_LORACONFIG'].fields_by_name['ignore_incoming']._serialized_options = b'\222?\002\020\003'
+  _globals['_LORACONFIGLITE'].fields_by_name['channel_num']._loaded_options = None
+  _globals['_LORACONFIGLITE'].fields_by_name['channel_num']._serialized_options = b'\222?\0028\020'
+  _globals['_LORACONFIG']._serialized_start=97
+  _globals['_LORACONFIG']._serialized_end=1555
+  _globals['_LORACONFIG_REGIONCODE']._serialized_start=741
+  _globals['_LORACONFIG_REGIONCODE']._serialized_end=1193
+  _globals['_LORACONFIG_MODEMPRESET']._serialized_start=1196
+  _globals['_LORACONFIG_MODEMPRESET']._serialized_end=1495
+  _globals['_LORACONFIG_FEM_LNA_MODE']._serialized_start=1497
+  _globals['_LORACONFIG_FEM_LNA_MODE']._serialized_end=1555
+  _globals['_LORACONFIGLITE']._serialized_start=1557
+  _globals['_LORACONFIGLITE']._serialized_end=1668
 # @@protoc_insertion_point(module_scope)
