@@ -230,6 +230,11 @@ class _PortNumEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTy
     Portnum for payloads from the official Meshtastic ATAK plugin using
     TAKPacketV2 with zstd dictionary compression.
     """
+    LORA_OTA_APP: _PortNum.ValueType  # 79
+    """signed firmware updates over lora.
+
+    ENCODING: binary (ota-common transport frames)
+    """
     GROUPALARM_APP: _PortNum.ValueType  # 112
     """
     GroupAlarm integration
@@ -479,6 +484,11 @@ ATAK_PLUGIN_V2: PortNum.ValueType  # 78
 ATAK Plugin V2
 Portnum for payloads from the official Meshtastic ATAK plugin using
 TAKPacketV2 with zstd dictionary compression.
+"""
+LORA_OTA_APP: PortNum.ValueType  # 79
+"""signed firmware updates over lora.
+
+ENCODING: binary (ota-common transport frames)
 """
 GROUPALARM_APP: PortNum.ValueType  # 112
 """

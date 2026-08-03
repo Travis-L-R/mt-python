@@ -438,6 +438,12 @@ class LoRaConfig(google.protobuf.message.Message):
         Only compatible with SX127x and SX126x chipsets.
         Comparable link budget and data rate to LONG_MODERATE.
         """
+        MEDIUM_TURBO: LoRaConfig._ModemPreset.ValueType  # 16
+        """
+        Medium Range - Turbo
+        This preset performs similarly to MEDIUM_FAST, but with 500kHz bandwidth.
+        It is not legal to use in all regions due to this wider bandwidth.
+        """
         NO_PRESET: LoRaConfig._ModemPreset.ValueType  # 255
         """
         Signifier for the absence of a preset
@@ -536,6 +542,12 @@ class LoRaConfig(google.protobuf.message.Message):
     Note: TCXO with tight tolerances (±5 ppm or better) is *absolutely required* at these narrow bandwidths.
     Only compatible with SX127x and SX126x chipsets.
     Comparable link budget and data rate to LONG_MODERATE.
+    """
+    MEDIUM_TURBO: LoRaConfig.ModemPreset.ValueType  # 16
+    """
+    Medium Range - Turbo
+    This preset performs similarly to MEDIUM_FAST, but with 500kHz bandwidth.
+    It is not legal to use in all regions due to this wider bandwidth.
     """
     NO_PRESET: LoRaConfig.ModemPreset.ValueType  # 255
     """

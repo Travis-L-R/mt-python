@@ -564,9 +564,9 @@ class _HardwareModelEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._
     """
     Heltec Mesh Node T096 board features an nRF52840 CPU and a TFT screen.
     """
-    TRACKER_T1000_E_PRO: _HardwareModel.ValueType  # 128
+    MESH_TRACKER_X1: _HardwareModel.ValueType  # 128
     """
-    Seeed studio T1000-E Pro tracker card. NRF52840 w/ LR2021 radio,
+    Seeed studio Mesh Tracker X1card. NRF52840 w/ LR2021 radio,
     GPS, button, buzzer, and sensors.
     """
     THINKNODE_M7: _HardwareModel.ValueType  # 129
@@ -610,6 +610,18 @@ class _HardwareModelEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._
     MESHNOLOGY_W10: _HardwareModel.ValueType  # 140
     """
     Meshnology W10
+    """
+    HELTEC_RC32: _HardwareModel.ValueType  # 141
+    """
+    Heltec ESP32S3 + SX1262
+    """
+    HELTEC_RC52: _HardwareModel.ValueType  # 142
+    """
+    Heltec NRF52840 + SX1262
+    """
+    HELTEC_RCC6: _HardwareModel.ValueType  # 143
+    """
+    Heltec ESP32C6 + SX1262
     """
     PRIVATE_HW: _HardwareModel.ValueType  # 255
     """
@@ -1157,9 +1169,9 @@ HELTEC_MESH_NODE_T096: HardwareModel.ValueType  # 127
 """
 Heltec Mesh Node T096 board features an nRF52840 CPU and a TFT screen.
 """
-TRACKER_T1000_E_PRO: HardwareModel.ValueType  # 128
+MESH_TRACKER_X1: HardwareModel.ValueType  # 128
 """
-Seeed studio T1000-E Pro tracker card. NRF52840 w/ LR2021 radio,
+Seeed studio Mesh Tracker X1card. NRF52840 w/ LR2021 radio,
 GPS, button, buzzer, and sensors.
 """
 THINKNODE_M7: HardwareModel.ValueType  # 129
@@ -1203,6 +1215,18 @@ Heltec Mesh Tower V2
 MESHNOLOGY_W10: HardwareModel.ValueType  # 140
 """
 Meshnology W10
+"""
+HELTEC_RC32: HardwareModel.ValueType  # 141
+"""
+Heltec ESP32S3 + SX1262
+"""
+HELTEC_RC52: HardwareModel.ValueType  # 142
+"""
+Heltec NRF52840 + SX1262
+"""
+HELTEC_RCC6: HardwareModel.ValueType  # 143
+"""
+Heltec ESP32C6 + SX1262
 """
 PRIVATE_HW: HardwareModel.ValueType  # 255
 """
@@ -1415,6 +1439,10 @@ class _FirmwareEditionEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper
     """
     Hamvention, the Dayton amateur radio convention
     """
+    FAB: _FirmwareEdition.ValueType  # 20
+    """
+    FAB, the international Fab Lab digital fabrication conference
+    """
     DIY_EDITION: _FirmwareEdition.ValueType  # 127
     """
     Placeholder for DIY and unofficial events
@@ -1449,6 +1477,10 @@ Burning Man, the yearly hippie gathering in the desert
 HAMVENTION: FirmwareEdition.ValueType  # 19
 """
 Hamvention, the Dayton amateur radio convention
+"""
+FAB: FirmwareEdition.ValueType  # 20
+"""
+FAB, the international Fab Lab digital fabrication conference
 """
 DIY_EDITION: FirmwareEdition.ValueType  # 127
 """
@@ -2706,6 +2738,7 @@ class Waypoint(google.protobuf.message.Message):
     BOUNDING_BOX_FIELD_NUMBER: builtins.int
     NOTIFY_ON_ENTER_FIELD_NUMBER: builtins.int
     NOTIFY_ON_EXIT_FIELD_NUMBER: builtins.int
+    NOTIFY_FAVORITES_ONLY_FIELD_NUMBER: builtins.int
     id: builtins.int
     """
     Id of the waypoint
@@ -2755,6 +2788,13 @@ class Waypoint(google.protobuf.message.Message):
     If true, a notification should be raised when a tracked node exits this
     waypoint's geofence (the circular radius and/or the bounding box).
     """
+    notify_favorites_only: builtins.bool
+    """
+    If true, only raise geofence enter/exit notifications for nodes that are
+    marked as favorites on the receiving device. Applies to both notify_on_enter
+    and notify_on_exit. Favorite status is resolved locally per receiver, so the
+    same waypoint alerts each node only for its own favorites.
+    """
     @property
     def bounding_box(self) -> global___BoundingBox:
         """
@@ -2777,9 +2817,10 @@ class Waypoint(google.protobuf.message.Message):
         bounding_box: global___BoundingBox | None = ...,
         notify_on_enter: builtins.bool = ...,
         notify_on_exit: builtins.bool = ...,
+        notify_favorites_only: builtins.bool = ...,
     ) -> None: ...
     def HasField(self, field_name: typing.Literal["_bounding_box", b"_bounding_box", "_latitude_i", b"_latitude_i", "_longitude_i", b"_longitude_i", "bounding_box", b"bounding_box", "latitude_i", b"latitude_i", "longitude_i", b"longitude_i"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["_bounding_box", b"_bounding_box", "_latitude_i", b"_latitude_i", "_longitude_i", b"_longitude_i", "bounding_box", b"bounding_box", "description", b"description", "expire", b"expire", "geofence_radius", b"geofence_radius", "icon", b"icon", "id", b"id", "latitude_i", b"latitude_i", "locked_to", b"locked_to", "longitude_i", b"longitude_i", "name", b"name", "notify_on_enter", b"notify_on_enter", "notify_on_exit", b"notify_on_exit"]) -> None: ...
+    def ClearField(self, field_name: typing.Literal["_bounding_box", b"_bounding_box", "_latitude_i", b"_latitude_i", "_longitude_i", b"_longitude_i", "bounding_box", b"bounding_box", "description", b"description", "expire", b"expire", "geofence_radius", b"geofence_radius", "icon", b"icon", "id", b"id", "latitude_i", b"latitude_i", "locked_to", b"locked_to", "longitude_i", b"longitude_i", "name", b"name", "notify_favorites_only", b"notify_favorites_only", "notify_on_enter", b"notify_on_enter", "notify_on_exit", b"notify_on_exit"]) -> None: ...
     @typing.overload
     def WhichOneof(self, oneof_group: typing.Literal["_bounding_box", b"_bounding_box"]) -> typing.Literal["bounding_box"] | None: ...
     @typing.overload
@@ -3161,6 +3202,12 @@ class MeshPacket(google.protobuf.message.Message):
     Note: this field is _never_ sent on the radio link itself (to save space) Times
     are typically not sent over the mesh, but they will be added to any Packet
     (chain of SubPacket) sent to the phone (so the phone can know exact time of reception)
+    Explicit presence: firmware cannot always attach a trustworthy wall-clock timestamp at the
+    moment of reception - a node with no GPS and no phone connected yet has no time source at
+    all. has_rx_time disambiguates that state from a genuine (if coincidental) 1970-01-01
+    reading. A packet delivered with this field absent may still be re-timestamped once a valid
+    clock becomes available, before the phone ever sees it - "absent" is not guaranteed
+    permanent, only "not yet known at last observation".
     """
     rx_snr: builtins.float
     """
@@ -3195,6 +3242,9 @@ class MeshPacket(google.protobuf.message.Message):
     rx_rssi: builtins.int
     """
     rssi of received packet. Only sent to phone for dispay purposes.
+    Explicit presence: rssi 0 is a legitimate reading on some radios (SX126x can report exactly
+    0 dBm; SX127x's formula can even go positive). has_rx_rssi disambiguates; a replayed packet
+    built from history should leave this field absent rather than emitting 0.
     """
     delayed: global___MeshPacket.Delayed.ValueType
     """
@@ -3208,6 +3258,10 @@ class MeshPacket(google.protobuf.message.Message):
     """
     Hop limit with which the original packet started. Sent via LoRa using three bits in the unencrypted header.
     When receiving a packet, the difference between hop_start and hop_limit gives how many hops it traveled.
+    hop_start == 0 does not necessarily mean a direct (0-hop) neighbor: firmware prior to 2.3.0
+    never populated this field, so a receiver can only trust hop_start == 0 as genuine once it has
+    decoded the packet and confirmed the sender's bitfield is present (added in 2.5.0). Until then,
+    or for a sender that never sets that bitfield, treat hop_start == 0 as unknown, not direct.
     """
     public_key: builtins.bytes
     """
@@ -3255,12 +3309,12 @@ class MeshPacket(google.protobuf.message.Message):
         decoded: global___Data | None = ...,
         encrypted: builtins.bytes = ...,
         id: builtins.int = ...,
-        rx_time: builtins.int = ...,
+        rx_time: builtins.int | None = ...,
         rx_snr: builtins.float = ...,
         hop_limit: builtins.int = ...,
         want_ack: builtins.bool = ...,
         priority: global___MeshPacket.Priority.ValueType = ...,
-        rx_rssi: builtins.int = ...,
+        rx_rssi: builtins.int | None = ...,
         delayed: global___MeshPacket.Delayed.ValueType = ...,
         via_mqtt: builtins.bool = ...,
         hop_start: builtins.int = ...,
@@ -3272,8 +3326,13 @@ class MeshPacket(google.protobuf.message.Message):
         transport_mechanism: global___MeshPacket.TransportMechanism.ValueType = ...,
         xeddsa_signed: builtins.bool = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["decoded", b"decoded", "encrypted", b"encrypted", "payload_variant", b"payload_variant"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["channel", b"channel", "decoded", b"decoded", "delayed", b"delayed", "encrypted", b"encrypted", "from", b"from", "hop_limit", b"hop_limit", "hop_start", b"hop_start", "id", b"id", "next_hop", b"next_hop", "payload_variant", b"payload_variant", "pki_encrypted", b"pki_encrypted", "priority", b"priority", "public_key", b"public_key", "relay_node", b"relay_node", "rx_rssi", b"rx_rssi", "rx_snr", b"rx_snr", "rx_time", b"rx_time", "to", b"to", "transport_mechanism", b"transport_mechanism", "tx_after", b"tx_after", "via_mqtt", b"via_mqtt", "want_ack", b"want_ack", "xeddsa_signed", b"xeddsa_signed"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["_rx_rssi", b"_rx_rssi", "_rx_time", b"_rx_time", "decoded", b"decoded", "encrypted", b"encrypted", "payload_variant", b"payload_variant", "rx_rssi", b"rx_rssi", "rx_time", b"rx_time"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["_rx_rssi", b"_rx_rssi", "_rx_time", b"_rx_time", "channel", b"channel", "decoded", b"decoded", "delayed", b"delayed", "encrypted", b"encrypted", "from", b"from", "hop_limit", b"hop_limit", "hop_start", b"hop_start", "id", b"id", "next_hop", b"next_hop", "payload_variant", b"payload_variant", "pki_encrypted", b"pki_encrypted", "priority", b"priority", "public_key", b"public_key", "relay_node", b"relay_node", "rx_rssi", b"rx_rssi", "rx_snr", b"rx_snr", "rx_time", b"rx_time", "to", b"to", "transport_mechanism", b"transport_mechanism", "tx_after", b"tx_after", "via_mqtt", b"via_mqtt", "want_ack", b"want_ack", "xeddsa_signed", b"xeddsa_signed"]) -> None: ...
+    @typing.overload
+    def WhichOneof(self, oneof_group: typing.Literal["_rx_rssi", b"_rx_rssi"]) -> typing.Literal["rx_rssi"] | None: ...
+    @typing.overload
+    def WhichOneof(self, oneof_group: typing.Literal["_rx_time", b"_rx_time"]) -> typing.Literal["rx_time"] | None: ...
+    @typing.overload
     def WhichOneof(self, oneof_group: typing.Literal["payload_variant", b"payload_variant"]) -> typing.Literal["decoded", "encrypted"] | None: ...
 
 global___MeshPacket = MeshPacket
@@ -4325,6 +4384,7 @@ class DeviceMetadata(google.protobuf.message.Message):
     HASREMOTEHARDWARE_FIELD_NUMBER: builtins.int
     HASPKC_FIELD_NUMBER: builtins.int
     EXCLUDED_MODULES_FIELD_NUMBER: builtins.int
+    HAS_XEDDSA_FIELD_NUMBER: builtins.int
     firmware_version: builtins.str
     """
     Device firmware version string
@@ -4374,6 +4434,11 @@ class DeviceMetadata(google.protobuf.message.Message):
     Bit field of boolean for excluded modules
     (bitwise OR of ExcludedModules)
     """
+    has_xeddsa: builtins.bool
+    """
+    Indicates whether this firmware build includes XEdDSA packet signature verification.
+    This is a read-only capability and must be false when XEdDSA is not compiled in.
+    """
     def __init__(
         self,
         *,
@@ -4389,8 +4454,9 @@ class DeviceMetadata(google.protobuf.message.Message):
         hasRemoteHardware: builtins.bool = ...,
         hasPKC: builtins.bool = ...,
         excluded_modules: builtins.int = ...,
+        has_xeddsa: builtins.bool = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing.Literal["canShutdown", b"canShutdown", "device_state_version", b"device_state_version", "excluded_modules", b"excluded_modules", "firmware_version", b"firmware_version", "hasBluetooth", b"hasBluetooth", "hasEthernet", b"hasEthernet", "hasPKC", b"hasPKC", "hasRemoteHardware", b"hasRemoteHardware", "hasWifi", b"hasWifi", "hw_model", b"hw_model", "position_flags", b"position_flags", "role", b"role"]) -> None: ...
+    def ClearField(self, field_name: typing.Literal["canShutdown", b"canShutdown", "device_state_version", b"device_state_version", "excluded_modules", b"excluded_modules", "firmware_version", b"firmware_version", "hasBluetooth", b"hasBluetooth", "hasEthernet", b"hasEthernet", "hasPKC", b"hasPKC", "hasRemoteHardware", b"hasRemoteHardware", "hasWifi", b"hasWifi", "has_xeddsa", b"has_xeddsa", "hw_model", b"hw_model", "position_flags", b"position_flags", "role", b"role"]) -> None: ...
 
 global___DeviceMetadata = DeviceMetadata
 

@@ -241,6 +241,14 @@ class _TelemetrySensorTypeEnumTypeWrapper(google.protobuf.internal.enum_type_wra
     """
     ICM-42607-P 6‑Axis IMU
     """
+    SPA06: _TelemetrySensorType.ValueType  # 54
+    """
+    SPA06 pressure and temperature
+    """
+    HM330X: _TelemetrySensorType.ValueType  # 55
+    """
+    HM330X PM SENSOR
+    """
 
 class TelemetrySensorType(_TelemetrySensorType, metaclass=_TelemetrySensorTypeEnumTypeWrapper):
     """
@@ -462,6 +470,14 @@ MMC5983MA 3-Axis Digital Magnetic Sensor
 ICM42607P: TelemetrySensorType.ValueType  # 53
 """
 ICM-42607-P 6‑Axis IMU
+"""
+SPA06: TelemetrySensorType.ValueType  # 54
+"""
+SPA06 pressure and temperature
+"""
+HM330X: TelemetrySensorType.ValueType  # 55
+"""
+HM330X PM SENSOR
 """
 global___TelemetrySensorType = TelemetrySensorType
 

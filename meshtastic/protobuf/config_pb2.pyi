@@ -1332,6 +1332,49 @@ class Config(google.protobuf.message.Message):
     class SecurityConfig(google.protobuf.message.Message):
         DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
+        class _PacketSignaturePolicy:
+            ValueType = typing.NewType("ValueType", builtins.int)
+            V: typing_extensions.TypeAlias = ValueType
+
+        class _PacketSignaturePolicyEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[Config.SecurityConfig._PacketSignaturePolicy.ValueType], builtins.type):
+            DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
+            PACKET_SIGNATURE_POLICY_COMPATIBLE: Config.SecurityConfig._PacketSignaturePolicy.ValueType  # 0
+            """
+            Accept unsigned packets for maximum compatibility while still rejecting malformed or invalid signatures.
+            This is the default to avoid legacy nodes dropping signed packets during rebroadcast.
+            """
+            PACKET_SIGNATURE_POLICY_BALANCED: Config.SecurityConfig._PacketSignaturePolicy.ValueType  # 1
+            """
+            Prefer authenticated packets while retaining compatibility with unsigned packets from nodes not known to sign.
+            Rejects unsigned, signable broadcasts from nodes that have previously signed.
+            """
+            PACKET_SIGNATURE_POLICY_STRICT: Config.SecurityConfig._PacketSignaturePolicy.ValueType  # 2
+            """
+            Accept only packets authenticated by a verified XEdDSA signature or successful PKI decryption.
+            Unsigned, malformed, invalid, or unverifiable packets are ignored.
+            """
+
+        class PacketSignaturePolicy(_PacketSignaturePolicy, metaclass=_PacketSignaturePolicyEnumTypeWrapper):
+            """
+            Controls how the device authenticates remotely received mesh packets.
+            """
+
+        PACKET_SIGNATURE_POLICY_COMPATIBLE: Config.SecurityConfig.PacketSignaturePolicy.ValueType  # 0
+        """
+        Accept unsigned packets for maximum compatibility while still rejecting malformed or invalid signatures.
+        This is the default to avoid legacy nodes dropping signed packets during rebroadcast.
+        """
+        PACKET_SIGNATURE_POLICY_BALANCED: Config.SecurityConfig.PacketSignaturePolicy.ValueType  # 1
+        """
+        Prefer authenticated packets while retaining compatibility with unsigned packets from nodes not known to sign.
+        Rejects unsigned, signable broadcasts from nodes that have previously signed.
+        """
+        PACKET_SIGNATURE_POLICY_STRICT: Config.SecurityConfig.PacketSignaturePolicy.ValueType  # 2
+        """
+        Accept only packets authenticated by a verified XEdDSA signature or successful PKI decryption.
+        Unsigned, malformed, invalid, or unverifiable packets are ignored.
+        """
+
         PUBLIC_KEY_FIELD_NUMBER: builtins.int
         PRIVATE_KEY_FIELD_NUMBER: builtins.int
         ADMIN_KEY_FIELD_NUMBER: builtins.int
@@ -1339,6 +1382,7 @@ class Config(google.protobuf.message.Message):
         SERIAL_ENABLED_FIELD_NUMBER: builtins.int
         DEBUG_LOG_API_ENABLED_FIELD_NUMBER: builtins.int
         ADMIN_CHANNEL_ENABLED_FIELD_NUMBER: builtins.int
+        PACKET_SIGNATURE_POLICY_FIELD_NUMBER: builtins.int
         public_key: builtins.bytes
         """
         The public key of the user's device.
@@ -1367,6 +1411,10 @@ class Config(google.protobuf.message.Message):
         """
         Allow incoming device control over the insecure legacy admin channel.
         """
+        packet_signature_policy: global___Config.SecurityConfig.PacketSignaturePolicy.ValueType
+        """
+        Determines the packet signature policy applied to remotely received mesh packets.
+        """
         @property
         def admin_key(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.bytes]:
             """
@@ -1383,8 +1431,9 @@ class Config(google.protobuf.message.Message):
             serial_enabled: builtins.bool = ...,
             debug_log_api_enabled: builtins.bool = ...,
             admin_channel_enabled: builtins.bool = ...,
+            packet_signature_policy: global___Config.SecurityConfig.PacketSignaturePolicy.ValueType = ...,
         ) -> None: ...
-        def ClearField(self, field_name: typing.Literal["admin_channel_enabled", b"admin_channel_enabled", "admin_key", b"admin_key", "debug_log_api_enabled", b"debug_log_api_enabled", "is_managed", b"is_managed", "private_key", b"private_key", "public_key", b"public_key", "serial_enabled", b"serial_enabled"]) -> None: ...
+        def ClearField(self, field_name: typing.Literal["admin_channel_enabled", b"admin_channel_enabled", "admin_key", b"admin_key", "debug_log_api_enabled", b"debug_log_api_enabled", "is_managed", b"is_managed", "packet_signature_policy", b"packet_signature_policy", "private_key", b"private_key", "public_key", b"public_key", "serial_enabled", b"serial_enabled"]) -> None: ...
 
     @typing.final
     class SessionkeyConfig(google.protobuf.message.Message):
