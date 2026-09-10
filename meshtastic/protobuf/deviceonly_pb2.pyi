@@ -188,6 +188,8 @@ class NodeInfoLite(google.protobuf.message.Message):
     bitfield: builtins.int
     """
     Bitfield for storing booleans. See NODEINFO_BITFIELD_* in src/mesh/NodeDB.h.
+    Bit 11 is NODEINFO_BITFIELD_HEARD_ON_CURRENT_LORA, mirrored on the wire as
+    NodeInfo.heard_on_current_lora.
     """
     long_name: builtins.str
     """Flattened user fields (formerly UserLite). macaddr dropped (deprecated 1.2.11).

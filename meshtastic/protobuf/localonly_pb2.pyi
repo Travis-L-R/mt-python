@@ -7,8 +7,6 @@ import builtins
 import google.protobuf.descriptor
 import google.protobuf.message
 import meshtastic.protobuf.config_pb2
-import meshtastic.protobuf.destinations_pb2
-import meshtastic.protobuf.lora_config_pb2
 import meshtastic.protobuf.module_config_pb2
 import typing
 
@@ -70,7 +68,7 @@ class LocalConfig(google.protobuf.message.Message):
         """
 
     @property
-    def lora(self) -> meshtastic.protobuf.lora_config_pb2.LoRaConfig:
+    def lora(self) -> meshtastic.protobuf.config_pb2.Config.LoRaConfig:
         """
         The part of the config that is specific to the Lora Radio
         """
@@ -88,9 +86,10 @@ class LocalConfig(google.protobuf.message.Message):
         """
 
     @property
-    def destinations(self) -> meshtastic.protobuf.destinations_pb2.DestinationsConfig:
+    def destinations(self) -> meshtastic.protobuf.config_pb2.Config.DestinationsConfig:
         """
         The part of the config that is specific to Destinations settings
+        Reserving 10, 11, 12, 13 for upstream changes
         """
 
     def __init__(
@@ -101,11 +100,11 @@ class LocalConfig(google.protobuf.message.Message):
         power: meshtastic.protobuf.config_pb2.Config.PowerConfig | None = ...,
         network: meshtastic.protobuf.config_pb2.Config.NetworkConfig | None = ...,
         display: meshtastic.protobuf.config_pb2.Config.DisplayConfig | None = ...,
-        lora: meshtastic.protobuf.lora_config_pb2.LoRaConfig | None = ...,
+        lora: meshtastic.protobuf.config_pb2.Config.LoRaConfig | None = ...,
         bluetooth: meshtastic.protobuf.config_pb2.Config.BluetoothConfig | None = ...,
         version: builtins.int = ...,
         security: meshtastic.protobuf.config_pb2.Config.SecurityConfig | None = ...,
-        destinations: meshtastic.protobuf.destinations_pb2.DestinationsConfig | None = ...,
+        destinations: meshtastic.protobuf.config_pb2.Config.DestinationsConfig | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing.Literal["bluetooth", b"bluetooth", "destinations", b"destinations", "device", b"device", "display", b"display", "lora", b"lora", "network", b"network", "position", b"position", "power", b"power", "security", b"security"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["bluetooth", b"bluetooth", "destinations", b"destinations", "device", b"device", "display", b"display", "lora", b"lora", "network", b"network", "position", b"position", "power", b"power", "security", b"security", "version", b"version"]) -> None: ...

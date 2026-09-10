@@ -11,7 +11,7 @@ import google.protobuf.internal.enum_type_wrapper
 import google.protobuf.message
 import meshtastic.protobuf.atak_pb2
 import meshtastic.protobuf.channel_pb2
-import meshtastic.protobuf.lora_config_pb2
+import meshtastic.protobuf.config_pb2
 import sys
 import typing
 
@@ -391,7 +391,19 @@ class ModuleConfig(google.protobuf.message.Message):
             CODEC2_1300: ModuleConfig.AudioConfig._Audio_Baud.ValueType  # 5
             CODEC2_1200: ModuleConfig.AudioConfig._Audio_Baud.ValueType  # 6
             CODEC2_700: ModuleConfig.AudioConfig._Audio_Baud.ValueType  # 7
+            """
+            Removed from libcodec2 upstream. A device configured to one of these
+            falls back to CODEC2_700C.
+            """
             CODEC2_700B: ModuleConfig.AudioConfig._Audio_Baud.ValueType  # 8
+            CODEC2_700C: ModuleConfig.AudioConfig._Audio_Baud.ValueType  # 9
+            """
+            Replaces CODEC2_700. Default for new configurations.
+            """
+            CODEC2_450: ModuleConfig.AudioConfig._Audio_Baud.ValueType  # 10
+            """
+            Lowest rate, and the only one usable on slower modem presets.
+            """
 
         class Audio_Baud(_Audio_Baud, metaclass=_Audio_BaudEnumTypeWrapper):
             """
@@ -406,7 +418,19 @@ class ModuleConfig(google.protobuf.message.Message):
         CODEC2_1300: ModuleConfig.AudioConfig.Audio_Baud.ValueType  # 5
         CODEC2_1200: ModuleConfig.AudioConfig.Audio_Baud.ValueType  # 6
         CODEC2_700: ModuleConfig.AudioConfig.Audio_Baud.ValueType  # 7
+        """
+        Removed from libcodec2 upstream. A device configured to one of these
+        falls back to CODEC2_700C.
+        """
         CODEC2_700B: ModuleConfig.AudioConfig.Audio_Baud.ValueType  # 8
+        CODEC2_700C: ModuleConfig.AudioConfig.Audio_Baud.ValueType  # 9
+        """
+        Replaces CODEC2_700. Default for new configurations.
+        """
+        CODEC2_450: ModuleConfig.AudioConfig.Audio_Baud.ValueType  # 10
+        """
+        Lowest rate, and the only one usable on slower modem presets.
+        """
 
         CODEC2_ENABLED_FIELD_NUMBER: builtins.int
         PTT_PIN_FIELD_NUMBER: builtins.int
@@ -425,7 +449,7 @@ class ModuleConfig(google.protobuf.message.Message):
         """
         bitrate: global___ModuleConfig.AudioConfig.Audio_Baud.ValueType
         """
-        The audio sample rate to use for codec2
+        The codec2 bitrate to encode at. Sample rate is always 8 kHz.
         """
         i2s_ws: builtins.int
         """
@@ -499,7 +523,10 @@ class ModuleConfig(google.protobuf.message.Message):
     class TrafficManagementConfig(google.protobuf.message.Message):
         """
         Config for the Traffic Management module.
-        Provides packet inspection and traffic shaping to help reduce channel utilization
+        Provides packet inspection and traffic shaping to help reduce channel utilization.
+        Every field uses the proto3 zero value to mean "disabled"; there is no
+        "use the firmware default" sentinel. Firmware installs its own defaults when it
+        first creates this config, and a client that writes 0 turns that feature off.
         """
 
         DESCRIPTOR: google.protobuf.descriptor.Descriptor
@@ -513,6 +540,7 @@ class ModuleConfig(google.protobuf.message.Message):
         """
         Minimum interval in seconds between position updates from the same node.
         A non-zero value implicitly enables the suppression window; 0 disables it.
+        Firmware default: 21600 (6 hours), installed when this config is first created.
         """
         nodeinfo_direct_response_max_hops: builtins.int
         """
@@ -1322,8 +1350,8 @@ class ModuleConfig(google.protobuf.message.Message):
         @typing.final
         class BroadcastTarget(google.protobuf.message.Message):
             """
-            One entry in the multi-target broadcast list.
-            The broadcaster transmits one beacon copy per entry, each on its own radio settings.
+            One entry in the broadcast destination list.
+            Each entry names one set of radio settings to send a beacon copy on.
             """
 
             DESCRIPTOR: google.protobuf.descriptor.Descriptor
@@ -1331,12 +1359,12 @@ class ModuleConfig(google.protobuf.message.Message):
             PRESET_FIELD_NUMBER: builtins.int
             REGION_FIELD_NUMBER: builtins.int
             CHANNEL_INDEX_FIELD_NUMBER: builtins.int
-            preset: meshtastic.protobuf.lora_config_pb2.LoRaConfig.ModemPreset.ValueType
+            preset: meshtastic.protobuf.config_pb2.Config.LoRaConfig.ModemPreset.ValueType
             """
             Modem preset to use for this target.
             Falls back to the running config preset if unset.
             """
-            region: meshtastic.protobuf.lora_config_pb2.LoRaConfig.RegionCode.ValueType
+            region: meshtastic.protobuf.config_pb2.Config.LoRaConfig.RegionCode.ValueType
             """
             Region to use for this target. UNSET means use the running config region.
             """
@@ -1353,8 +1381,8 @@ class ModuleConfig(google.protobuf.message.Message):
             def __init__(
                 self,
                 *,
-                preset: meshtastic.protobuf.lora_config_pb2.LoRaConfig.ModemPreset.ValueType | None = ...,
-                region: meshtastic.protobuf.lora_config_pb2.LoRaConfig.RegionCode.ValueType = ...,
+                preset: meshtastic.protobuf.config_pb2.Config.LoRaConfig.ModemPreset.ValueType | None = ...,
+                region: meshtastic.protobuf.config_pb2.Config.LoRaConfig.RegionCode.ValueType = ...,
                 channel_index: builtins.int | None = ...,
             ) -> None: ...
             def HasField(self, field_name: typing.Literal["_channel_index", b"_channel_index", "_preset", b"_preset", "channel_index", b"channel_index", "preset", b"preset"]) -> builtins.bool: ...
@@ -1365,48 +1393,27 @@ class ModuleConfig(google.protobuf.message.Message):
             def WhichOneof(self, oneof_group: typing.Literal["_preset", b"_preset"]) -> typing.Literal["preset"] | None: ...
 
         FLAGS_FIELD_NUMBER: builtins.int
-        BROADCAST_SEND_AS_NODE_FIELD_NUMBER: builtins.int
         BROADCAST_MESSAGE_FIELD_NUMBER: builtins.int
         BROADCAST_OFFER_CHANNEL_FIELD_NUMBER: builtins.int
         BROADCAST_OFFER_REGION_FIELD_NUMBER: builtins.int
         BROADCAST_OFFER_PRESET_FIELD_NUMBER: builtins.int
-        BROADCAST_ON_CHANNEL_FIELD_NUMBER: builtins.int
-        BROADCAST_ON_REGION_FIELD_NUMBER: builtins.int
-        BROADCAST_ON_PRESET_FIELD_NUMBER: builtins.int
         BROADCAST_INTERVAL_SECS_FIELD_NUMBER: builtins.int
         BROADCAST_TARGETS_FIELD_NUMBER: builtins.int
         flags: builtins.int
         """
         Bitwise-OR of Flags values (listen / broadcast / legacy-split toggles).
         """
-        broadcast_send_as_node: builtins.int
-        """
-        Optional: node ID to send beacon messages AS.
-        When set, the `from` field of outgoing beacon packets is set to this node ID,
-        making beacons appear to originate from that node.
-        When unset (0), beacons are sent as the local node.
-        A remote admin can only set this field to their own node ID.
-        """
         broadcast_message: builtins.str
         """
         Message to include in each beacon broadcast. Max 100 bytes enforced by firmware.
         """
-        broadcast_offer_region: meshtastic.protobuf.lora_config_pb2.LoRaConfig.RegionCode.ValueType
+        broadcast_offer_region: meshtastic.protobuf.config_pb2.Config.LoRaConfig.RegionCode.ValueType
         """
         Optional region to advertise in the MeshBeacon offer_region field.
         """
-        broadcast_offer_preset: meshtastic.protobuf.lora_config_pb2.LoRaConfig.ModemPreset.ValueType
+        broadcast_offer_preset: meshtastic.protobuf.config_pb2.Config.LoRaConfig.ModemPreset.ValueType
         """
         Optional modem preset to advertise in the MeshBeacon offer_preset field.
-        """
-        broadcast_on_region: meshtastic.protobuf.lora_config_pb2.LoRaConfig.RegionCode.ValueType
-        """
-        Region to use when sending beacons on broadcast_on_preset.
-        """
-        broadcast_on_preset: meshtastic.protobuf.lora_config_pb2.LoRaConfig.ModemPreset.ValueType
-        """
-        Modem preset to use when sending beacons.
-        If different from current config, the radio is temporarily switched for TX.
         """
         broadcast_interval_secs: builtins.int
         """
@@ -1419,50 +1426,31 @@ class ModuleConfig(google.protobuf.message.Message):
             """
 
         @property
-        def broadcast_on_channel(self) -> meshtastic.protobuf.channel_pb2.ChannelSettings:
-            """
-            Single-target TX channel: channel settings (name + PSK) to send beacons on.
-            If unset, beacons go out on the primary channel. Used only when broadcast_targets is empty.
-            NOTE: the single-target path embeds the ChannelSettings inline here, whereas a
-            broadcast_targets entry references a channel-table slot by channel_index instead — see
-            BroadcastTarget. The two paths are equal, first-class options; only this representation differs.
-            """
-
-        @property
         def broadcast_targets(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___ModuleConfig.MeshBeaconConfig.BroadcastTarget]:
             """
-            Multi-target broadcast list.
-            When non-empty the broadcaster transmits one beacon copy per entry in sequence,
-            each temporarily switching the radio to that entry's preset/region/channel.
-            When empty, the broadcaster uses the scalar broadcast_on_preset / broadcast_on_region /
-            broadcast_on_channel fields instead (the single-target path).
-            Single- and multi-target are equal, first-class options — neither is preferred or
-            deprecated. They differ only in how the TX channel is named: broadcast_on_channel embeds a
-            ChannelSettings inline, while a target references an existing channel-table slot by
-            channel_index (see BroadcastTarget).
+            Broadcast destination list.
+            The broadcaster sends one beacon copy per distinct destination, in sequence, temporarily
+            switching the radio to that entry's preset/region/channel for each.
+            When empty, a single beacon is sent on the node's running preset and region over the
+            primary channel.
+            Entries that resolve to the same effective preset, region and channel are deduplicated, so
+            a duplicate entry does not produce a second transmission.
             """
 
         def __init__(
             self,
             *,
             flags: builtins.int = ...,
-            broadcast_send_as_node: builtins.int = ...,
             broadcast_message: builtins.str = ...,
             broadcast_offer_channel: meshtastic.protobuf.channel_pb2.ChannelSettings | None = ...,
-            broadcast_offer_region: meshtastic.protobuf.lora_config_pb2.LoRaConfig.RegionCode.ValueType = ...,
-            broadcast_offer_preset: meshtastic.protobuf.lora_config_pb2.LoRaConfig.ModemPreset.ValueType | None = ...,
-            broadcast_on_channel: meshtastic.protobuf.channel_pb2.ChannelSettings | None = ...,
-            broadcast_on_region: meshtastic.protobuf.lora_config_pb2.LoRaConfig.RegionCode.ValueType = ...,
-            broadcast_on_preset: meshtastic.protobuf.lora_config_pb2.LoRaConfig.ModemPreset.ValueType | None = ...,
+            broadcast_offer_region: meshtastic.protobuf.config_pb2.Config.LoRaConfig.RegionCode.ValueType = ...,
+            broadcast_offer_preset: meshtastic.protobuf.config_pb2.Config.LoRaConfig.ModemPreset.ValueType | None = ...,
             broadcast_interval_secs: builtins.int = ...,
             broadcast_targets: collections.abc.Iterable[global___ModuleConfig.MeshBeaconConfig.BroadcastTarget] | None = ...,
         ) -> None: ...
-        def HasField(self, field_name: typing.Literal["_broadcast_offer_preset", b"_broadcast_offer_preset", "_broadcast_on_preset", b"_broadcast_on_preset", "broadcast_offer_channel", b"broadcast_offer_channel", "broadcast_offer_preset", b"broadcast_offer_preset", "broadcast_on_channel", b"broadcast_on_channel", "broadcast_on_preset", b"broadcast_on_preset"]) -> builtins.bool: ...
-        def ClearField(self, field_name: typing.Literal["_broadcast_offer_preset", b"_broadcast_offer_preset", "_broadcast_on_preset", b"_broadcast_on_preset", "broadcast_interval_secs", b"broadcast_interval_secs", "broadcast_message", b"broadcast_message", "broadcast_offer_channel", b"broadcast_offer_channel", "broadcast_offer_preset", b"broadcast_offer_preset", "broadcast_offer_region", b"broadcast_offer_region", "broadcast_on_channel", b"broadcast_on_channel", "broadcast_on_preset", b"broadcast_on_preset", "broadcast_on_region", b"broadcast_on_region", "broadcast_send_as_node", b"broadcast_send_as_node", "broadcast_targets", b"broadcast_targets", "flags", b"flags"]) -> None: ...
-        @typing.overload
+        def HasField(self, field_name: typing.Literal["_broadcast_offer_preset", b"_broadcast_offer_preset", "broadcast_offer_channel", b"broadcast_offer_channel", "broadcast_offer_preset", b"broadcast_offer_preset"]) -> builtins.bool: ...
+        def ClearField(self, field_name: typing.Literal["_broadcast_offer_preset", b"_broadcast_offer_preset", "broadcast_interval_secs", b"broadcast_interval_secs", "broadcast_message", b"broadcast_message", "broadcast_offer_channel", b"broadcast_offer_channel", "broadcast_offer_preset", b"broadcast_offer_preset", "broadcast_offer_region", b"broadcast_offer_region", "broadcast_targets", b"broadcast_targets", "flags", b"flags"]) -> None: ...
         def WhichOneof(self, oneof_group: typing.Literal["_broadcast_offer_preset", b"_broadcast_offer_preset"]) -> typing.Literal["broadcast_offer_preset"] | None: ...
-        @typing.overload
-        def WhichOneof(self, oneof_group: typing.Literal["_broadcast_on_preset", b"_broadcast_on_preset"]) -> typing.Literal["broadcast_on_preset"] | None: ...
 
     @typing.final
     class TAKConfig(google.protobuf.message.Message):

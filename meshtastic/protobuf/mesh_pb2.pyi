@@ -12,7 +12,6 @@ import google.protobuf.message
 import meshtastic.protobuf.channel_pb2
 import meshtastic.protobuf.config_pb2
 import meshtastic.protobuf.device_ui_pb2
-import meshtastic.protobuf.lora_config_pb2
 import meshtastic.protobuf.module_config_pb2
 import meshtastic.protobuf.portnums_pb2
 import meshtastic.protobuf.telemetry_pb2
@@ -623,6 +622,22 @@ class _HardwareModelEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._
     """
     Heltec ESP32C6 + SX1262
     """
+    SEEED_WIO_TRACKER_L1_PRO_1W: _HardwareModel.ValueType  # 144
+    """
+    Seeed Wio Tracker L1 Pro 1W, nRF52840 + SX1262 with 1 W external PA
+    """
+    MESHNOLOGY_W12: _HardwareModel.ValueType  # 145
+    """
+    Meshnology W12
+    """
+    MESHPAGER_X2: _HardwareModel.ValueType  # 146
+    """
+    Seeed Studio MeshPager X2
+    """
+    T_CONNECT_PRO: _HardwareModel.ValueType  # 147
+    """
+    Lilygo T-CONNECT PRO
+    """
     PRIVATE_HW: _HardwareModel.ValueType  # 255
     """
     ------------------------------------------------------------------------------------------------------------------------------------------
@@ -1228,6 +1243,22 @@ HELTEC_RCC6: HardwareModel.ValueType  # 143
 """
 Heltec ESP32C6 + SX1262
 """
+SEEED_WIO_TRACKER_L1_PRO_1W: HardwareModel.ValueType  # 144
+"""
+Seeed Wio Tracker L1 Pro 1W, nRF52840 + SX1262 with 1 W external PA
+"""
+MESHNOLOGY_W12: HardwareModel.ValueType  # 145
+"""
+Meshnology W12
+"""
+MESHPAGER_X2: HardwareModel.ValueType  # 146
+"""
+Seeed Studio MeshPager X2
+"""
+T_CONNECT_PRO: HardwareModel.ValueType  # 147
+"""
+Lilygo T-CONNECT PRO
+"""
 PRIVATE_HW: HardwareModel.ValueType  # 255
 """
 ------------------------------------------------------------------------------------------------------------------------------------------
@@ -1443,6 +1474,14 @@ class _FirmwareEditionEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper
     """
     FAB, the international Fab Lab digital fabrication conference
     """
+    DRAGON_CON: _FirmwareEdition.ValueType  # 21
+    """
+    Dragon Con, the yearly pop culture convention in Atlanta, GA
+    """
+    CCC: _FirmwareEdition.ValueType  # 22
+    """
+    Chaos Communication Congress, the hacker conference held yearly in Germany
+    """
     DIY_EDITION: _FirmwareEdition.ValueType  # 127
     """
     Placeholder for DIY and unofficial events
@@ -1481,6 +1520,14 @@ Hamvention, the Dayton amateur radio convention
 FAB: FirmwareEdition.ValueType  # 20
 """
 FAB, the international Fab Lab digital fabrication conference
+"""
+DRAGON_CON: FirmwareEdition.ValueType  # 21
+"""
+Dragon Con, the yearly pop culture convention in Atlanta, GA
+"""
+CCC: FirmwareEdition.ValueType  # 22
+"""
+Chaos Communication Congress, the hacker conference held yearly in Germany
 """
 DIY_EDITION: FirmwareEdition.ValueType  # 127
 """
@@ -1830,7 +1877,7 @@ class Position(google.protobuf.message.Message):
     """
     ground_speed: builtins.int
     """
-    Ground speed in m/s and True North TRACK in 1/100 degrees
+    Ground speed in km/h and True North TRACK in 1/100 degrees
     Clarification of terms:
     - "track" is the direction of motion (measured in horizontal plane)
     - "heading" is where the fuselage points (measured in horizontal plane)
@@ -2355,6 +2402,7 @@ class Data(google.protobuf.message.Message):
     def leap_data(self) -> global___LeapData:
         """
         Path data for packets sent using leap destinations.
+        reserving 11,12,13, for upstream changes
         """
 
     def __init__(
@@ -3374,6 +3422,7 @@ class NodeInfo(google.protobuf.message.Message):
     IS_KEY_MANUALLY_VERIFIED_FIELD_NUMBER: builtins.int
     IS_MUTED_FIELD_NUMBER: builtins.int
     HAS_XEDDSA_SIGNED_FIELD_NUMBER: builtins.int
+    HEARD_ON_CURRENT_LORA_FIELD_NUMBER: builtins.int
     num: builtins.int
     """
     The node number
@@ -3432,6 +3481,17 @@ class NodeInfo(google.protobuf.message.Message):
     Persists between NodeDB internal clean ups
     LSB 1 of the bitfield
     """
+    heard_on_current_lora: builtins.bool
+    """
+    True if we have heard this node over RF since our current LoRa
+    configuration took effect. Cleared for every node whenever the region,
+    modem preset (or the custom bandwidth/spread factor/coding rate when
+    use_preset is false), override_frequency, channel_num or the primary
+    channel name changes - the frequency slot is derived from that name.
+    Not set for nodes heard over MQTT, which reach us over the internet
+    rather than over our own radio - see via_mqtt.
+    LSB 11 of the bitfield
+    """
     @property
     def user(self) -> global___User:
         """
@@ -3468,9 +3528,10 @@ class NodeInfo(google.protobuf.message.Message):
         is_key_manually_verified: builtins.bool = ...,
         is_muted: builtins.bool = ...,
         has_xeddsa_signed: builtins.bool = ...,
+        heard_on_current_lora: builtins.bool = ...,
     ) -> None: ...
     def HasField(self, field_name: typing.Literal["_hops_away", b"_hops_away", "device_metrics", b"device_metrics", "hops_away", b"hops_away", "position", b"position", "user", b"user"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["_hops_away", b"_hops_away", "channel", b"channel", "device_metrics", b"device_metrics", "has_xeddsa_signed", b"has_xeddsa_signed", "hops_away", b"hops_away", "is_favorite", b"is_favorite", "is_ignored", b"is_ignored", "is_key_manually_verified", b"is_key_manually_verified", "is_muted", b"is_muted", "last_heard", b"last_heard", "num", b"num", "position", b"position", "snr", b"snr", "user", b"user", "via_mqtt", b"via_mqtt"]) -> None: ...
+    def ClearField(self, field_name: typing.Literal["_hops_away", b"_hops_away", "channel", b"channel", "device_metrics", b"device_metrics", "has_xeddsa_signed", b"has_xeddsa_signed", "heard_on_current_lora", b"heard_on_current_lora", "hops_away", b"hops_away", "is_favorite", b"is_favorite", "is_ignored", b"is_ignored", "is_key_manually_verified", b"is_key_manually_verified", "is_muted", b"is_muted", "last_heard", b"last_heard", "num", b"num", "position", b"position", "snr", b"snr", "user", b"user", "via_mqtt", b"via_mqtt"]) -> None: ...
     def WhichOneof(self, oneof_group: typing.Literal["_hops_away", b"_hops_away"]) -> typing.Literal["hops_away"] | None: ...
 
 global___NodeInfo = NodeInfo
@@ -3960,15 +4021,15 @@ class LockdownStatus(google.protobuf.message.Message):
     lock_reason: builtins.str
     """
     For LOCKED: machine-readable reason. Known values:
-      "needs_auth"        — storage already unlocked, client must auth
-      "token_missing"     — no boot token on flash
-      "token_expired"     — boot token wall-clock TTL elapsed
-      "token_boots_zero"  — boot token boot-count TTL exhausted
-      "token_hmac_fail"   — token tampered or wrong device
-      "token_dek_fail"    — token DEK decrypt failed
-      "token_wrong_size"  — token file corrupted
-      "token_bad_magic"   — token file corrupted
-      "not_provisioned"   — should generally use NEEDS_PROVISION state instead
+      "needs_auth"        - storage already unlocked, client must auth
+      "token_missing"     - no boot token on flash
+      "token_expired"     - boot token wall-clock TTL elapsed
+      "token_boots_zero"  - boot token boot-count TTL exhausted
+      "token_hmac_fail"   - token tampered or wrong device
+      "token_dek_fail"    - token DEK decrypt failed
+      "token_wrong_size"  - token file corrupted
+      "token_bad_magic"   - token file corrupted
+      "not_provisioned"   - should generally use NEEDS_PROVISION state instead
     Other values may be added; clients should treat unknown values as
     "locked, ask for passphrase".
     """
@@ -4475,7 +4536,7 @@ class LoRaPresetGroup(google.protobuf.message.Message):
     PRESETS_FIELD_NUMBER: builtins.int
     DEFAULT_PRESET_FIELD_NUMBER: builtins.int
     LICENSED_ONLY_FIELD_NUMBER: builtins.int
-    default_preset: meshtastic.protobuf.lora_config_pb2.LoRaConfig.ModemPreset.ValueType
+    default_preset: meshtastic.protobuf.config_pb2.Config.LoRaConfig.ModemPreset.ValueType
     """
     The firmware's default modem preset for regions in this group.
     Always one of `presets`. Clients should select this when switching to one
@@ -4487,7 +4548,7 @@ class LoRaPresetGroup(google.protobuf.message.Message):
     (e.g. amateur / ham radio bands). Clients should warn or gate accordingly.
     """
     @property
-    def presets(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[meshtastic.protobuf.lora_config_pb2.LoRaConfig.ModemPreset.ValueType]:
+    def presets(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[meshtastic.protobuf.config_pb2.Config.LoRaConfig.ModemPreset.ValueType]:
         """
         The modem presets that are legal for every region referencing this group.
         """
@@ -4495,8 +4556,8 @@ class LoRaPresetGroup(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        presets: collections.abc.Iterable[meshtastic.protobuf.lora_config_pb2.LoRaConfig.ModemPreset.ValueType] | None = ...,
-        default_preset: meshtastic.protobuf.lora_config_pb2.LoRaConfig.ModemPreset.ValueType = ...,
+        presets: collections.abc.Iterable[meshtastic.protobuf.config_pb2.Config.LoRaConfig.ModemPreset.ValueType] | None = ...,
+        default_preset: meshtastic.protobuf.config_pb2.Config.LoRaConfig.ModemPreset.ValueType = ...,
         licensed_only: builtins.bool = ...,
     ) -> None: ...
     def ClearField(self, field_name: typing.Literal["default_preset", b"default_preset", "licensed_only", b"licensed_only", "presets", b"presets"]) -> None: ...
@@ -4513,7 +4574,7 @@ class LoRaRegionPresets(google.protobuf.message.Message):
 
     REGION_FIELD_NUMBER: builtins.int
     GROUP_INDEX_FIELD_NUMBER: builtins.int
-    region: meshtastic.protobuf.lora_config_pb2.LoRaConfig.RegionCode.ValueType
+    region: meshtastic.protobuf.config_pb2.Config.LoRaConfig.RegionCode.ValueType
     """
     The LoRa region this entry describes.
     """
@@ -4525,7 +4586,7 @@ class LoRaRegionPresets(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        region: meshtastic.protobuf.lora_config_pb2.LoRaConfig.RegionCode.ValueType = ...,
+        region: meshtastic.protobuf.config_pb2.Config.LoRaConfig.RegionCode.ValueType = ...,
         group_index: builtins.int = ...,
     ) -> None: ...
     def ClearField(self, field_name: typing.Literal["group_index", b"group_index", "region", b"region"]) -> None: ...

@@ -9,9 +9,7 @@ import google.protobuf.descriptor
 import google.protobuf.internal.containers
 import google.protobuf.internal.enum_type_wrapper
 import google.protobuf.message
-import meshtastic.protobuf.destinations_pb2
 import meshtastic.protobuf.device_ui_pb2
-import meshtastic.protobuf.lora_config_pb2
 import sys
 import typing
 
@@ -126,10 +124,11 @@ class Config(google.protobuf.message.Message):
                from weaker, indoor, or less-well-positioned nodes. Recommended for users with multiple nodes
                where one CLIENT_BASE acts as a more powerful base station, such as an attic/roof node.
             """
-            CLIENT_LATE: Config.DeviceConfig._Role.ValueType  # 13
+            CLIENT_LATE: Config.DeviceConfig._Role.ValueType  # 15
             """
             Description: Device that will wait until other nodes should have rebroadcast, and only rebroadcast if no one else has and channel utilization is low)
             Technical Details: Intended for use when a node wouldn't normally be able to contribute helpfully to the mesh, but you still want it to be able to.
+            Reserving 13, 14 in case of upstream additions
             """
 
         class Role(_Role, metaclass=_RoleEnumTypeWrapper):
@@ -223,10 +222,11 @@ class Config(google.protobuf.message.Message):
            from weaker, indoor, or less-well-positioned nodes. Recommended for users with multiple nodes
            where one CLIENT_BASE acts as a more powerful base station, such as an attic/roof node.
         """
-        CLIENT_LATE: Config.DeviceConfig.Role.ValueType  # 13
+        CLIENT_LATE: Config.DeviceConfig.Role.ValueType  # 15
         """
         Description: Device that will wait until other nodes should have rebroadcast, and only rebroadcast if no one else has and channel utilization is low)
         Technical Details: Intended for use when a node wouldn't normally be able to contribute helpfully to the mesh, but you still want it to be able to.
+        Reserving 13, 14 in case of upstream additions
         """
 
         class _RebroadcastMode:
@@ -1268,6 +1268,733 @@ class Config(google.protobuf.message.Message):
         def ClearField(self, field_name: typing.Literal["auto_screen_carousel_secs", b"auto_screen_carousel_secs", "compass_north_top", b"compass_north_top", "compass_orientation", b"compass_orientation", "displaymode", b"displaymode", "enable_message_bubbles", b"enable_message_bubbles", "flip_screen", b"flip_screen", "gps_format", b"gps_format", "heading_bold", b"heading_bold", "oled", b"oled", "screen_on_secs", b"screen_on_secs", "units", b"units", "use_12h_clock", b"use_12h_clock", "use_long_node_name", b"use_long_node_name", "wake_on_tap_or_motion", b"wake_on_tap_or_motion"]) -> None: ...
 
     @typing.final
+    class LoRaConfig(google.protobuf.message.Message):
+        """
+        Lora Config
+        """
+
+        DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+        class _RegionCode:
+            ValueType = typing.NewType("ValueType", builtins.int)
+            V: typing_extensions.TypeAlias = ValueType
+
+        class _RegionCodeEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[Config.LoRaConfig._RegionCode.ValueType], builtins.type):
+            DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
+            UNSET: Config.LoRaConfig._RegionCode.ValueType  # 0
+            """
+            Region is not set
+            """
+            US: Config.LoRaConfig._RegionCode.ValueType  # 1
+            """
+            United States
+            """
+            EU_433: Config.LoRaConfig._RegionCode.ValueType  # 2
+            """
+            European Union 433mhz
+            """
+            EU_868: Config.LoRaConfig._RegionCode.ValueType  # 3
+            """
+            European Union 868mhz
+            """
+            CN: Config.LoRaConfig._RegionCode.ValueType  # 4
+            """
+            China
+            """
+            JP: Config.LoRaConfig._RegionCode.ValueType  # 5
+            """
+            Japan
+            """
+            ANZ: Config.LoRaConfig._RegionCode.ValueType  # 6
+            """
+            Australia / New Zealand
+            """
+            KR: Config.LoRaConfig._RegionCode.ValueType  # 7
+            """
+            Korea
+            """
+            TW: Config.LoRaConfig._RegionCode.ValueType  # 8
+            """
+            Taiwan
+            """
+            RU: Config.LoRaConfig._RegionCode.ValueType  # 9
+            """
+            Russia
+            """
+            IN: Config.LoRaConfig._RegionCode.ValueType  # 10
+            """
+            India
+            """
+            NZ_865: Config.LoRaConfig._RegionCode.ValueType  # 11
+            """
+            New Zealand 865mhz
+            """
+            TH: Config.LoRaConfig._RegionCode.ValueType  # 12
+            """
+            Thailand
+            """
+            LORA_24: Config.LoRaConfig._RegionCode.ValueType  # 13
+            """
+            WLAN Band
+            """
+            UA_433: Config.LoRaConfig._RegionCode.ValueType  # 14
+            """
+            Ukraine 433mhz
+            """
+            UA_868: Config.LoRaConfig._RegionCode.ValueType  # 15
+            """
+            Ukraine 868mhz
+            """
+            MY_433: Config.LoRaConfig._RegionCode.ValueType  # 16
+            """
+            Malaysia 433mhz
+            """
+            MY_919: Config.LoRaConfig._RegionCode.ValueType  # 17
+            """
+            Malaysia 919mhz
+            """
+            SG_923: Config.LoRaConfig._RegionCode.ValueType  # 18
+            """
+            Singapore 923mhz
+            """
+            PH_433: Config.LoRaConfig._RegionCode.ValueType  # 19
+            """
+            Philippines 433mhz
+            """
+            PH_868: Config.LoRaConfig._RegionCode.ValueType  # 20
+            """
+            Philippines 868mhz
+            """
+            PH_915: Config.LoRaConfig._RegionCode.ValueType  # 21
+            """
+            Philippines 915mhz
+            """
+            ANZ_433: Config.LoRaConfig._RegionCode.ValueType  # 22
+            """
+            Australia / New Zealand 433MHz
+            """
+            KZ_433: Config.LoRaConfig._RegionCode.ValueType  # 23
+            """
+            Kazakhstan 433MHz
+            """
+            KZ_863: Config.LoRaConfig._RegionCode.ValueType  # 24
+            """
+            Kazakhstan 863MHz
+            """
+            NP_865: Config.LoRaConfig._RegionCode.ValueType  # 25
+            """
+            Nepal 865MHz
+            """
+            BR_902: Config.LoRaConfig._RegionCode.ValueType  # 26
+            """
+            Brazil 902MHz
+            """
+            ITU1_2M: Config.LoRaConfig._RegionCode.ValueType  # 27
+            """
+            ITU Region 1 Amateur Radio 2m band (144-146 MHz)
+            """
+            ITU2_2M: Config.LoRaConfig._RegionCode.ValueType  # 28
+            """
+            ITU Region 2 Amateur Radio 2m band (144-148 MHz)
+            """
+            EU_866: Config.LoRaConfig._RegionCode.ValueType  # 29
+            """
+            EU 866MHz band (Band no. 47b of 2006/771/EC and subsequent amendments) for Non-specific short-range devices (SRD)
+            """
+            EU_874: Config.LoRaConfig._RegionCode.ValueType  # 30
+            """
+            EU 874MHz and 917MHz bands (Band no. 1 and 4 of 2022/172/EC and subsequent amendments) for Non-specific short-range devices (SRD)
+            """
+            EU_917: Config.LoRaConfig._RegionCode.ValueType  # 31
+            EU_N_868: Config.LoRaConfig._RegionCode.ValueType  # 32
+            """
+            EU 868MHz band, with narrow presets
+            """
+            ITU3_2M: Config.LoRaConfig._RegionCode.ValueType  # 33
+            """
+            ITU Region 3 Amateur Radio 2m band (144-148 MHz)
+            """
+            ITU1_70CM: Config.LoRaConfig._RegionCode.ValueType  # 34
+            """
+            ITU Region 1 Amateur Radio 70cm band (430-440 MHz)
+            """
+            ITU2_70CM: Config.LoRaConfig._RegionCode.ValueType  # 35
+            """
+            ITU Region 2 Amateur Radio 70cm band (420-450 MHz)
+            Note: Some countries do not allocate 420-430 MHz or 440-450 MHz.
+            Check local law!
+            """
+            ITU3_70CM: Config.LoRaConfig._RegionCode.ValueType  # 36
+            """
+            ITU Region 3 Amateur Radio 70cm band (430-450 MHz)
+            Note: Some countries do not allocate 440-450 MHz. Check local law!
+            """
+            ITU2_125CM: Config.LoRaConfig._RegionCode.ValueType  # 37
+            """
+            ITU Region 2 Amateur Radio 1.25m '125cm' band (220-225 MHz)
+            Note: Some countries do not allocate 220-222 MHz (Ex: USA/Canada).
+            Check local law!
+            """
+
+        class RegionCode(_RegionCode, metaclass=_RegionCodeEnumTypeWrapper): ...
+        UNSET: Config.LoRaConfig.RegionCode.ValueType  # 0
+        """
+        Region is not set
+        """
+        US: Config.LoRaConfig.RegionCode.ValueType  # 1
+        """
+        United States
+        """
+        EU_433: Config.LoRaConfig.RegionCode.ValueType  # 2
+        """
+        European Union 433mhz
+        """
+        EU_868: Config.LoRaConfig.RegionCode.ValueType  # 3
+        """
+        European Union 868mhz
+        """
+        CN: Config.LoRaConfig.RegionCode.ValueType  # 4
+        """
+        China
+        """
+        JP: Config.LoRaConfig.RegionCode.ValueType  # 5
+        """
+        Japan
+        """
+        ANZ: Config.LoRaConfig.RegionCode.ValueType  # 6
+        """
+        Australia / New Zealand
+        """
+        KR: Config.LoRaConfig.RegionCode.ValueType  # 7
+        """
+        Korea
+        """
+        TW: Config.LoRaConfig.RegionCode.ValueType  # 8
+        """
+        Taiwan
+        """
+        RU: Config.LoRaConfig.RegionCode.ValueType  # 9
+        """
+        Russia
+        """
+        IN: Config.LoRaConfig.RegionCode.ValueType  # 10
+        """
+        India
+        """
+        NZ_865: Config.LoRaConfig.RegionCode.ValueType  # 11
+        """
+        New Zealand 865mhz
+        """
+        TH: Config.LoRaConfig.RegionCode.ValueType  # 12
+        """
+        Thailand
+        """
+        LORA_24: Config.LoRaConfig.RegionCode.ValueType  # 13
+        """
+        WLAN Band
+        """
+        UA_433: Config.LoRaConfig.RegionCode.ValueType  # 14
+        """
+        Ukraine 433mhz
+        """
+        UA_868: Config.LoRaConfig.RegionCode.ValueType  # 15
+        """
+        Ukraine 868mhz
+        """
+        MY_433: Config.LoRaConfig.RegionCode.ValueType  # 16
+        """
+        Malaysia 433mhz
+        """
+        MY_919: Config.LoRaConfig.RegionCode.ValueType  # 17
+        """
+        Malaysia 919mhz
+        """
+        SG_923: Config.LoRaConfig.RegionCode.ValueType  # 18
+        """
+        Singapore 923mhz
+        """
+        PH_433: Config.LoRaConfig.RegionCode.ValueType  # 19
+        """
+        Philippines 433mhz
+        """
+        PH_868: Config.LoRaConfig.RegionCode.ValueType  # 20
+        """
+        Philippines 868mhz
+        """
+        PH_915: Config.LoRaConfig.RegionCode.ValueType  # 21
+        """
+        Philippines 915mhz
+        """
+        ANZ_433: Config.LoRaConfig.RegionCode.ValueType  # 22
+        """
+        Australia / New Zealand 433MHz
+        """
+        KZ_433: Config.LoRaConfig.RegionCode.ValueType  # 23
+        """
+        Kazakhstan 433MHz
+        """
+        KZ_863: Config.LoRaConfig.RegionCode.ValueType  # 24
+        """
+        Kazakhstan 863MHz
+        """
+        NP_865: Config.LoRaConfig.RegionCode.ValueType  # 25
+        """
+        Nepal 865MHz
+        """
+        BR_902: Config.LoRaConfig.RegionCode.ValueType  # 26
+        """
+        Brazil 902MHz
+        """
+        ITU1_2M: Config.LoRaConfig.RegionCode.ValueType  # 27
+        """
+        ITU Region 1 Amateur Radio 2m band (144-146 MHz)
+        """
+        ITU2_2M: Config.LoRaConfig.RegionCode.ValueType  # 28
+        """
+        ITU Region 2 Amateur Radio 2m band (144-148 MHz)
+        """
+        EU_866: Config.LoRaConfig.RegionCode.ValueType  # 29
+        """
+        EU 866MHz band (Band no. 47b of 2006/771/EC and subsequent amendments) for Non-specific short-range devices (SRD)
+        """
+        EU_874: Config.LoRaConfig.RegionCode.ValueType  # 30
+        """
+        EU 874MHz and 917MHz bands (Band no. 1 and 4 of 2022/172/EC and subsequent amendments) for Non-specific short-range devices (SRD)
+        """
+        EU_917: Config.LoRaConfig.RegionCode.ValueType  # 31
+        EU_N_868: Config.LoRaConfig.RegionCode.ValueType  # 32
+        """
+        EU 868MHz band, with narrow presets
+        """
+        ITU3_2M: Config.LoRaConfig.RegionCode.ValueType  # 33
+        """
+        ITU Region 3 Amateur Radio 2m band (144-148 MHz)
+        """
+        ITU1_70CM: Config.LoRaConfig.RegionCode.ValueType  # 34
+        """
+        ITU Region 1 Amateur Radio 70cm band (430-440 MHz)
+        """
+        ITU2_70CM: Config.LoRaConfig.RegionCode.ValueType  # 35
+        """
+        ITU Region 2 Amateur Radio 70cm band (420-450 MHz)
+        Note: Some countries do not allocate 420-430 MHz or 440-450 MHz.
+        Check local law!
+        """
+        ITU3_70CM: Config.LoRaConfig.RegionCode.ValueType  # 36
+        """
+        ITU Region 3 Amateur Radio 70cm band (430-450 MHz)
+        Note: Some countries do not allocate 440-450 MHz. Check local law!
+        """
+        ITU2_125CM: Config.LoRaConfig.RegionCode.ValueType  # 37
+        """
+        ITU Region 2 Amateur Radio 1.25m '125cm' band (220-225 MHz)
+        Note: Some countries do not allocate 220-222 MHz (Ex: USA/Canada).
+        Check local law!
+        """
+
+        class _ModemPreset:
+            ValueType = typing.NewType("ValueType", builtins.int)
+            V: typing_extensions.TypeAlias = ValueType
+
+        class _ModemPresetEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[Config.LoRaConfig._ModemPreset.ValueType], builtins.type):
+            DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
+            LONG_FAST: Config.LoRaConfig._ModemPreset.ValueType  # 0
+            """
+            Long Range - Fast
+            """
+            LONG_SLOW: Config.LoRaConfig._ModemPreset.ValueType  # 1
+            """
+            Long Range - Slow
+            Deprecated in 2.7: Unpopular slow preset.
+            """
+            VERY_LONG_SLOW: Config.LoRaConfig._ModemPreset.ValueType  # 2
+            """
+            Very Long Range - Slow
+            Deprecated in 2.5: Works only with txco and is unusably slow
+            """
+            MEDIUM_SLOW: Config.LoRaConfig._ModemPreset.ValueType  # 3
+            """
+            Medium Range - Slow
+            """
+            MEDIUM_FAST: Config.LoRaConfig._ModemPreset.ValueType  # 4
+            """
+            Medium Range - Fast
+            """
+            SHORT_SLOW: Config.LoRaConfig._ModemPreset.ValueType  # 5
+            """
+            Short Range - Slow
+            """
+            SHORT_FAST: Config.LoRaConfig._ModemPreset.ValueType  # 6
+            """
+            Short Range - Fast
+            """
+            LONG_MODERATE: Config.LoRaConfig._ModemPreset.ValueType  # 7
+            """
+            Long Range - Moderately Fast
+            """
+            SHORT_TURBO: Config.LoRaConfig._ModemPreset.ValueType  # 8
+            """
+            Short Range - Turbo
+            This is the fastest preset and the only one with 500kHz bandwidth.
+            It is not legal to use in all regions due to this wider bandwidth.
+            """
+            LONG_TURBO: Config.LoRaConfig._ModemPreset.ValueType  # 9
+            """
+            Long Range - Turbo
+            This preset performs similarly to LongFast, but with 500Khz bandwidth.
+            """
+            LITE_FAST: Config.LoRaConfig._ModemPreset.ValueType  # 10
+            """
+            Lite Fast
+            Medium range preset optimized for EU 866MHz SRD band with 125kHz bandwidth.
+            Comparable link budget to MEDIUM_FAST but compliant with Band no. 47b of 2006/771/EC.
+            """
+            LITE_SLOW: Config.LoRaConfig._ModemPreset.ValueType  # 11
+            """
+            Lite Slow
+            Medium-to-moderate range preset optimized for EU 866MHz SRD band with 125kHz bandwidth.
+            Comparable link budget to LONG_FAST but compliant with Band no. 47b of 2006/771/EC.
+            """
+            NARROW_FAST: Config.LoRaConfig._ModemPreset.ValueType  # 12
+            """
+            Narrow Fast
+            Medium-to-moderate range preset optimized for EU 868MHz band with 62.5kHz bandwidth.
+            Comparable link budget to SHORT_SLOW, but with half the data rate.
+            Intended to avoid interference with other devices.
+            """
+            NARROW_SLOW: Config.LoRaConfig._ModemPreset.ValueType  # 13
+            """
+            Narrow Slow
+            Moderate range preset optimized for EU 868MHz band with 62.5kHz bandwidth.
+            Comparable link budget and data rate to LONG_FAST.
+            """
+            TINY_FAST: Config.LoRaConfig._ModemPreset.ValueType  # 14
+            """
+            Tiny Fast
+            Preset optimized for compliance with Amateur Radio restrictions with 20kHz bandwidth.
+            Many regions limit data transmission bandwidth in lower amateur bands (2 Meter).
+            Note: TCXO with tight tolerances (±5 ppm or better) is *absolutely required* at these narrow bandwidths.
+            Only compatible with SX127x and SX126x chipsets.
+            Comparable link budget and data rate to LONG_FAST.
+            """
+            TINY_SLOW: Config.LoRaConfig._ModemPreset.ValueType  # 15
+            """
+            Tiny Slow
+            Preset optimized for compliance with Amateur Radio restrictions with 20kHz bandwidth.
+            Many regions limit data transmission bandwidth in lower amateur bands (2 Meter).
+            Note: TCXO with tight tolerances (±5 ppm or better) is *absolutely required* at these narrow bandwidths.
+            Only compatible with SX127x and SX126x chipsets.
+            Comparable link budget and data rate to LONG_MODERATE.
+            """
+            MEDIUM_TURBO: Config.LoRaConfig._ModemPreset.ValueType  # 16
+            """
+            Medium Range - Turbo
+            This preset performs similarly to MEDIUM_FAST, but with 500kHz bandwidth.
+            It is not legal to use in all regions due to this wider bandwidth.
+            """
+            NO_PRESET: Config.LoRaConfig._ModemPreset.ValueType  # 255
+            """
+            Signifier for the absence of a preset
+            """
+
+        class ModemPreset(_ModemPreset, metaclass=_ModemPresetEnumTypeWrapper):
+            """
+            Standard predefined channel settings
+            Note: these mappings must match ModemPreset Choice in the device code.
+            """
+
+        LONG_FAST: Config.LoRaConfig.ModemPreset.ValueType  # 0
+        """
+        Long Range - Fast
+        """
+        LONG_SLOW: Config.LoRaConfig.ModemPreset.ValueType  # 1
+        """
+        Long Range - Slow
+        Deprecated in 2.7: Unpopular slow preset.
+        """
+        VERY_LONG_SLOW: Config.LoRaConfig.ModemPreset.ValueType  # 2
+        """
+        Very Long Range - Slow
+        Deprecated in 2.5: Works only with txco and is unusably slow
+        """
+        MEDIUM_SLOW: Config.LoRaConfig.ModemPreset.ValueType  # 3
+        """
+        Medium Range - Slow
+        """
+        MEDIUM_FAST: Config.LoRaConfig.ModemPreset.ValueType  # 4
+        """
+        Medium Range - Fast
+        """
+        SHORT_SLOW: Config.LoRaConfig.ModemPreset.ValueType  # 5
+        """
+        Short Range - Slow
+        """
+        SHORT_FAST: Config.LoRaConfig.ModemPreset.ValueType  # 6
+        """
+        Short Range - Fast
+        """
+        LONG_MODERATE: Config.LoRaConfig.ModemPreset.ValueType  # 7
+        """
+        Long Range - Moderately Fast
+        """
+        SHORT_TURBO: Config.LoRaConfig.ModemPreset.ValueType  # 8
+        """
+        Short Range - Turbo
+        This is the fastest preset and the only one with 500kHz bandwidth.
+        It is not legal to use in all regions due to this wider bandwidth.
+        """
+        LONG_TURBO: Config.LoRaConfig.ModemPreset.ValueType  # 9
+        """
+        Long Range - Turbo
+        This preset performs similarly to LongFast, but with 500Khz bandwidth.
+        """
+        LITE_FAST: Config.LoRaConfig.ModemPreset.ValueType  # 10
+        """
+        Lite Fast
+        Medium range preset optimized for EU 866MHz SRD band with 125kHz bandwidth.
+        Comparable link budget to MEDIUM_FAST but compliant with Band no. 47b of 2006/771/EC.
+        """
+        LITE_SLOW: Config.LoRaConfig.ModemPreset.ValueType  # 11
+        """
+        Lite Slow
+        Medium-to-moderate range preset optimized for EU 866MHz SRD band with 125kHz bandwidth.
+        Comparable link budget to LONG_FAST but compliant with Band no. 47b of 2006/771/EC.
+        """
+        NARROW_FAST: Config.LoRaConfig.ModemPreset.ValueType  # 12
+        """
+        Narrow Fast
+        Medium-to-moderate range preset optimized for EU 868MHz band with 62.5kHz bandwidth.
+        Comparable link budget to SHORT_SLOW, but with half the data rate.
+        Intended to avoid interference with other devices.
+        """
+        NARROW_SLOW: Config.LoRaConfig.ModemPreset.ValueType  # 13
+        """
+        Narrow Slow
+        Moderate range preset optimized for EU 868MHz band with 62.5kHz bandwidth.
+        Comparable link budget and data rate to LONG_FAST.
+        """
+        TINY_FAST: Config.LoRaConfig.ModemPreset.ValueType  # 14
+        """
+        Tiny Fast
+        Preset optimized for compliance with Amateur Radio restrictions with 20kHz bandwidth.
+        Many regions limit data transmission bandwidth in lower amateur bands (2 Meter).
+        Note: TCXO with tight tolerances (±5 ppm or better) is *absolutely required* at these narrow bandwidths.
+        Only compatible with SX127x and SX126x chipsets.
+        Comparable link budget and data rate to LONG_FAST.
+        """
+        TINY_SLOW: Config.LoRaConfig.ModemPreset.ValueType  # 15
+        """
+        Tiny Slow
+        Preset optimized for compliance with Amateur Radio restrictions with 20kHz bandwidth.
+        Many regions limit data transmission bandwidth in lower amateur bands (2 Meter).
+        Note: TCXO with tight tolerances (±5 ppm or better) is *absolutely required* at these narrow bandwidths.
+        Only compatible with SX127x and SX126x chipsets.
+        Comparable link budget and data rate to LONG_MODERATE.
+        """
+        MEDIUM_TURBO: Config.LoRaConfig.ModemPreset.ValueType  # 16
+        """
+        Medium Range - Turbo
+        This preset performs similarly to MEDIUM_FAST, but with 500kHz bandwidth.
+        It is not legal to use in all regions due to this wider bandwidth.
+        """
+        NO_PRESET: Config.LoRaConfig.ModemPreset.ValueType  # 255
+        """
+        Signifier for the absence of a preset
+        """
+
+        class _FEM_LNA_Mode:
+            ValueType = typing.NewType("ValueType", builtins.int)
+            V: typing_extensions.TypeAlias = ValueType
+
+        class _FEM_LNA_ModeEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[Config.LoRaConfig._FEM_LNA_Mode.ValueType], builtins.type):
+            DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
+            DISABLED: Config.LoRaConfig._FEM_LNA_Mode.ValueType  # 0
+            """
+            FEM_LNA is present but disabled
+            """
+            ENABLED: Config.LoRaConfig._FEM_LNA_Mode.ValueType  # 1
+            """
+            FEM_LNA is present and enabled
+            """
+            NOT_PRESENT: Config.LoRaConfig._FEM_LNA_Mode.ValueType  # 2
+            """
+            FEM_LNA is not present on the device
+            """
+
+        class FEM_LNA_Mode(_FEM_LNA_Mode, metaclass=_FEM_LNA_ModeEnumTypeWrapper): ...
+        DISABLED: Config.LoRaConfig.FEM_LNA_Mode.ValueType  # 0
+        """
+        FEM_LNA is present but disabled
+        """
+        ENABLED: Config.LoRaConfig.FEM_LNA_Mode.ValueType  # 1
+        """
+        FEM_LNA is present and enabled
+        """
+        NOT_PRESENT: Config.LoRaConfig.FEM_LNA_Mode.ValueType  # 2
+        """
+        FEM_LNA is not present on the device
+        """
+
+        USE_PRESET_FIELD_NUMBER: builtins.int
+        MODEM_PRESET_FIELD_NUMBER: builtins.int
+        BANDWIDTH_FIELD_NUMBER: builtins.int
+        SPREAD_FACTOR_FIELD_NUMBER: builtins.int
+        CODING_RATE_FIELD_NUMBER: builtins.int
+        FREQUENCY_OFFSET_FIELD_NUMBER: builtins.int
+        REGION_FIELD_NUMBER: builtins.int
+        HOP_LIMIT_FIELD_NUMBER: builtins.int
+        TX_ENABLED_FIELD_NUMBER: builtins.int
+        TX_POWER_FIELD_NUMBER: builtins.int
+        CHANNEL_NUM_FIELD_NUMBER: builtins.int
+        OVERRIDE_DUTY_CYCLE_FIELD_NUMBER: builtins.int
+        SX126X_RX_BOOSTED_GAIN_FIELD_NUMBER: builtins.int
+        OVERRIDE_FREQUENCY_FIELD_NUMBER: builtins.int
+        PA_FAN_DISABLED_FIELD_NUMBER: builtins.int
+        IGNORE_INCOMING_FIELD_NUMBER: builtins.int
+        IGNORE_MQTT_FIELD_NUMBER: builtins.int
+        CONFIG_OK_TO_MQTT_FIELD_NUMBER: builtins.int
+        FEM_LNA_MODE_FIELD_NUMBER: builtins.int
+        SERIAL_HAL_ONLY_FIELD_NUMBER: builtins.int
+        use_preset: builtins.bool
+        """
+        When enabled, the `modem_preset` fields will be adhered to, else the `bandwidth`/`spread_factor`/`coding_rate`
+        will be taked from their respective manually defined fields
+        """
+        modem_preset: global___Config.LoRaConfig.ModemPreset.ValueType
+        """
+        Either modem_config or bandwidth/spreading/coding will be specified - NOT BOTH.
+        As a heuristic: If bandwidth is specified, do not use modem_config.
+        Because protobufs take ZERO space when the value is zero this works out nicely.
+        This value is replaced by bandwidth/spread_factor/coding_rate.
+        If you'd like to experiment with other options add them to MeshRadio.cpp in the device code.
+        """
+        bandwidth: builtins.int
+        """
+        Bandwidth in MHz
+        Certain bandwidth numbers are 'special' and will be converted to the
+        appropriate floating point value: 31 -> 31.25MHz
+        """
+        spread_factor: builtins.int
+        """
+        A number from 7 to 12.
+        Indicates number of chirps per symbol as 1<<spread_factor.
+        """
+        coding_rate: builtins.int
+        """
+        The denominator of the coding rate.
+        ie for 4/5, the value is 5. 4/8 the value is 8.
+        """
+        frequency_offset: builtins.float
+        """
+        This parameter is for advanced users with advanced test equipment, we do not recommend most users use it.
+        A frequency offset that is added to to the calculated band center frequency.
+        Used to correct for crystal calibration errors.
+        """
+        region: global___Config.LoRaConfig.RegionCode.ValueType
+        """
+        The region code for the radio (US, CN, EU433, etc...)
+        """
+        hop_limit: builtins.int
+        """
+        Maximum number of hops. This can't be greater than 7.
+        Default of 3
+        Attempting to set a value > 7 results in the default
+        """
+        tx_enabled: builtins.bool
+        """
+        Disable TX from the LoRa radio. Useful for hot-swapping antennas and other tests.
+        Defaults to false
+        """
+        tx_power: builtins.int
+        """
+        If zero, then use default max legal continuous power (ie. something that won't
+        burn out the radio hardware)
+        In most cases you should use zero here.
+        Units are in dBm.
+        """
+        channel_num: builtins.int
+        """
+        This controls the actual hardware frequency the radio transmits on.
+        Most users should never need to be exposed to this field/concept.
+        A channel number between 1 and NUM_CHANNELS (whatever the max is in the current region).
+        If ZERO then the rule is "use the old channel name hash based
+        algorithm to derive the channel number")
+        If using the hash algorithm the channel number will be: hash(channel_name) %
+        NUM_CHANNELS (Where num channels depends on the regulatory region).
+        """
+        override_duty_cycle: builtins.bool
+        """
+        If true, duty cycle limits will be exceeded and thus you're possibly not following
+        the local regulations if you're not a HAM.
+        Has no effect if the duty cycle of the used region is 100%.
+        """
+        sx126x_rx_boosted_gain: builtins.bool
+        """
+        If true, sets RX boosted gain mode on SX126X based radios
+        """
+        override_frequency: builtins.float
+        """
+        This parameter is for advanced users and licensed HAM radio operators.
+        Ignore Channel Calculation and use this frequency instead. The frequency_offset
+        will still be applied. This will allow you to use out-of-band frequencies.
+        Please respect your local laws and regulations. If you are a HAM, make sure you
+        enable HAM mode and turn off encryption.
+        """
+        pa_fan_disabled: builtins.bool
+        """
+        If true, disable the build-in PA FAN using pin define in RF95_FAN_EN.
+        """
+        ignore_mqtt: builtins.bool
+        """
+        If true, the device will not process any packets received via LoRa that passed via MQTT anywhere on the path towards it.
+        """
+        config_ok_to_mqtt: builtins.bool
+        """
+        Sets the ok_to_mqtt bit on outgoing packets
+        """
+        fem_lna_mode: global___Config.LoRaConfig.FEM_LNA_Mode.ValueType
+        """
+        Set where LORA FEM is enabled, disabled, or not present
+        """
+        serial_hal_only: builtins.bool
+        """
+        Don't use radiolib to initialize the radio, instead listen for a serialHal connection
+        """
+        @property
+        def ignore_incoming(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.int]:
+            """
+            For testing it is useful sometimes to force a node to never listen to
+            particular other nodes (simulating radio out of range). All nodenums listed
+            in ignore_incoming will have packets they send dropped on receive (by router.cpp)
+            """
+
+        def __init__(
+            self,
+            *,
+            use_preset: builtins.bool = ...,
+            modem_preset: global___Config.LoRaConfig.ModemPreset.ValueType = ...,
+            bandwidth: builtins.int = ...,
+            spread_factor: builtins.int = ...,
+            coding_rate: builtins.int = ...,
+            frequency_offset: builtins.float = ...,
+            region: global___Config.LoRaConfig.RegionCode.ValueType = ...,
+            hop_limit: builtins.int = ...,
+            tx_enabled: builtins.bool = ...,
+            tx_power: builtins.int = ...,
+            channel_num: builtins.int = ...,
+            override_duty_cycle: builtins.bool = ...,
+            sx126x_rx_boosted_gain: builtins.bool = ...,
+            override_frequency: builtins.float = ...,
+            pa_fan_disabled: builtins.bool = ...,
+            ignore_incoming: collections.abc.Iterable[builtins.int] | None = ...,
+            ignore_mqtt: builtins.bool = ...,
+            config_ok_to_mqtt: builtins.bool = ...,
+            fem_lna_mode: global___Config.LoRaConfig.FEM_LNA_Mode.ValueType = ...,
+            serial_hal_only: builtins.bool = ...,
+        ) -> None: ...
+        def ClearField(self, field_name: typing.Literal["bandwidth", b"bandwidth", "channel_num", b"channel_num", "coding_rate", b"coding_rate", "config_ok_to_mqtt", b"config_ok_to_mqtt", "fem_lna_mode", b"fem_lna_mode", "frequency_offset", b"frequency_offset", "hop_limit", b"hop_limit", "ignore_incoming", b"ignore_incoming", "ignore_mqtt", b"ignore_mqtt", "modem_preset", b"modem_preset", "override_duty_cycle", b"override_duty_cycle", "override_frequency", b"override_frequency", "pa_fan_disabled", b"pa_fan_disabled", "region", b"region", "serial_hal_only", b"serial_hal_only", "spread_factor", b"spread_factor", "sx126x_rx_boosted_gain", b"sx126x_rx_boosted_gain", "tx_enabled", b"tx_enabled", "tx_power", b"tx_power", "use_preset", b"use_preset"]) -> None: ...
+
+    @typing.final
     class BluetoothConfig(google.protobuf.message.Message):
         DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -1447,6 +2174,177 @@ class Config(google.protobuf.message.Message):
             self,
         ) -> None: ...
 
+    @typing.final
+    class LoRaConfigLite(google.protobuf.message.Message):
+        """
+        Simplified Lora Config for switching between presets
+        """
+
+        DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+        MODEM_PRESET_FIELD_NUMBER: builtins.int
+        CHANNEL_NUM_FIELD_NUMBER: builtins.int
+        modem_preset: global___Config.LoRaConfig.ModemPreset.ValueType
+        """
+        Modem preset to select
+        """
+        channel_num: builtins.int
+        """
+        LoRa frequency channel slot to use.
+        65535 is treated as "unset" for some purposes.
+        """
+        def __init__(
+            self,
+            *,
+            modem_preset: global___Config.LoRaConfig.ModemPreset.ValueType = ...,
+            channel_num: builtins.int = ...,
+        ) -> None: ...
+        def ClearField(self, field_name: typing.Literal["channel_num", b"channel_num", "modem_preset", b"modem_preset"]) -> None: ...
+
+    @typing.final
+    class DestinationsConfig(google.protobuf.message.Message):
+        DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+        @typing.final
+        class MeshDestination(google.protobuf.message.Message):
+            DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+            NUM_FIELD_NUMBER: builtins.int
+            HOP_LIMIT_FIELD_NUMBER: builtins.int
+            NEXT_HOP_FIELD_NUMBER: builtins.int
+            FIRST_LEAP_FIELD_NUMBER: builtins.int
+            LAST_LEAP_FIELD_NUMBER: builtins.int
+            LORA_SWITCH_FIELD_NUMBER: builtins.int
+            num: builtins.int
+            """
+            The node number for this destination
+            """
+            hop_limit: builtins.int
+            """
+            Alternative hop limit to use for this destination (zero represents default)
+            """
+            next_hop: builtins.int
+            """
+            Manual next hop specification for messages to this node (zero represents default)
+            """
+            first_leap: builtins.int
+            """
+            Node number of first desired leap node toward this destination (optional).
+            At least one of first_leap or last_leap should be set to a valid node number
+            if leaping is desired.
+            """
+            last_leap: builtins.int
+            """
+            Node number of last desired leap node toward this destination (optional).
+            This should ordinarily be the closest reliable node to the destination.
+            """
+            @property
+            def lora_switch(self) -> global___Config.LoRaConfigLite:
+                """
+                LoRa modem settings to switch out temporarily for messages sent to this destination.
+                """
+
+            def __init__(
+                self,
+                *,
+                num: builtins.int = ...,
+                hop_limit: builtins.int | None = ...,
+                next_hop: builtins.int | None = ...,
+                first_leap: builtins.int | None = ...,
+                last_leap: builtins.int | None = ...,
+                lora_switch: global___Config.LoRaConfigLite | None = ...,
+            ) -> None: ...
+            def HasField(self, field_name: typing.Literal["_first_leap", b"_first_leap", "_hop_limit", b"_hop_limit", "_last_leap", b"_last_leap", "_lora_switch", b"_lora_switch", "_next_hop", b"_next_hop", "first_leap", b"first_leap", "hop_limit", b"hop_limit", "last_leap", b"last_leap", "lora_switch", b"lora_switch", "next_hop", b"next_hop"]) -> builtins.bool: ...
+            def ClearField(self, field_name: typing.Literal["_first_leap", b"_first_leap", "_hop_limit", b"_hop_limit", "_last_leap", b"_last_leap", "_lora_switch", b"_lora_switch", "_next_hop", b"_next_hop", "first_leap", b"first_leap", "hop_limit", b"hop_limit", "last_leap", b"last_leap", "lora_switch", b"lora_switch", "next_hop", b"next_hop", "num", b"num"]) -> None: ...
+            @typing.overload
+            def WhichOneof(self, oneof_group: typing.Literal["_first_leap", b"_first_leap"]) -> typing.Literal["first_leap"] | None: ...
+            @typing.overload
+            def WhichOneof(self, oneof_group: typing.Literal["_hop_limit", b"_hop_limit"]) -> typing.Literal["hop_limit"] | None: ...
+            @typing.overload
+            def WhichOneof(self, oneof_group: typing.Literal["_last_leap", b"_last_leap"]) -> typing.Literal["last_leap"] | None: ...
+            @typing.overload
+            def WhichOneof(self, oneof_group: typing.Literal["_lora_switch", b"_lora_switch"]) -> typing.Literal["lora_switch"] | None: ...
+            @typing.overload
+            def WhichOneof(self, oneof_group: typing.Literal["_next_hop", b"_next_hop"]) -> typing.Literal["next_hop"] | None: ...
+
+        DEFAULT_DEST_FIELD_NUMBER: builtins.int
+        NODEINFO_DEST_FIELD_NUMBER: builtins.int
+        TELEMETRY_DEST_FIELD_NUMBER: builtins.int
+        POSITION_DEST_FIELD_NUMBER: builtins.int
+        DESTINATIONS_FIELD_NUMBER: builtins.int
+        LEAPS_ENABLED_FIELD_NUMBER: builtins.int
+        LEAP_CHANNEL_FIELD_NUMBER: builtins.int
+        LORA_SWITCH_ENABLED_FIELD_NUMBER: builtins.int
+        ONLY_LORA_SWITCH_FROM_US_FIELD_NUMBER: builtins.int
+        ONLY_LEAP_SWITCH_MESSAGES_FIELD_NUMBER: builtins.int
+        NODEINFO_CHANNEL_FIELD_NUMBER: builtins.int
+        default_dest: builtins.int
+        """
+        Optional default destination for most types of packets that would otherwise be sent to broadcast.
+        """
+        nodeinfo_dest: builtins.int
+        """
+        Optional destination for nodeinfo messages. Defaults to default_dest (or if none, broadcast).
+        """
+        telemetry_dest: builtins.int
+        """
+        Optional destination for telemetry messages. Defaults to default_dest (or if none, broadcast).
+        """
+        position_dest: builtins.int
+        """
+        Optional destination for position messages. Defaults to default_dest (or if none, broadcast).
+        """
+        leaps_enabled: builtins.bool
+        """
+        Whether to use leaping or not.
+        """
+        leap_channel: builtins.int
+        """
+        Can be used to specify a dedicated channel to send leap messages on. Intended for backwards compatbility with leap-naive nodes.
+        The leap channel should accordingly not use the default AQ== PSK.
+        """
+        lora_switch_enabled: builtins.bool
+        """
+        Whether to allow LoRa channel switching for destinations
+        """
+        only_lora_switch_from_us: builtins.bool
+        """
+        Whether to restrict LoRa channel switching to packets from us (not both acting as intermediate leap node and switching) 
+        so that leaps can be enabled for others without also switch radio settings for others.
+        """
+        only_leap_switch_messages: builtins.bool
+        """
+        Whether to restrict leaping with LoRa radio setting changes to messages.
+        Only works if only_lora_switch_from_us is not set and the message is decodable.
+        """
+        nodeinfo_channel: builtins.int
+        """
+        Option to select alternative channel to send nodeinfo broadcasts out on.
+        E.g. for if your primary channel is private but you still want your info to appear on a default (but secondary) channel
+        """
+        @property
+        def destinations(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___Config.DestinationsConfig.MeshDestination]:
+            """
+            Configuration slots for custom handling of specified destinations
+            """
+
+        def __init__(
+            self,
+            *,
+            default_dest: builtins.int = ...,
+            nodeinfo_dest: builtins.int = ...,
+            telemetry_dest: builtins.int = ...,
+            position_dest: builtins.int = ...,
+            destinations: collections.abc.Iterable[global___Config.DestinationsConfig.MeshDestination] | None = ...,
+            leaps_enabled: builtins.bool = ...,
+            leap_channel: builtins.int = ...,
+            lora_switch_enabled: builtins.bool = ...,
+            only_lora_switch_from_us: builtins.bool = ...,
+            only_leap_switch_messages: builtins.bool = ...,
+            nodeinfo_channel: builtins.int = ...,
+        ) -> None: ...
+        def ClearField(self, field_name: typing.Literal["default_dest", b"default_dest", "destinations", b"destinations", "leap_channel", b"leap_channel", "leaps_enabled", b"leaps_enabled", "lora_switch_enabled", b"lora_switch_enabled", "nodeinfo_channel", b"nodeinfo_channel", "nodeinfo_dest", b"nodeinfo_dest", "only_leap_switch_messages", b"only_leap_switch_messages", "only_lora_switch_from_us", b"only_lora_switch_from_us", "position_dest", b"position_dest", "telemetry_dest", b"telemetry_dest"]) -> None: ...
+
     DEVICE_FIELD_NUMBER: builtins.int
     POSITION_FIELD_NUMBER: builtins.int
     POWER_FIELD_NUMBER: builtins.int
@@ -1469,7 +2367,7 @@ class Config(google.protobuf.message.Message):
     @property
     def display(self) -> global___Config.DisplayConfig: ...
     @property
-    def lora(self) -> meshtastic.protobuf.lora_config_pb2.LoRaConfig: ...
+    def lora(self) -> global___Config.LoRaConfig: ...
     @property
     def bluetooth(self) -> global___Config.BluetoothConfig: ...
     @property
@@ -1479,7 +2377,7 @@ class Config(google.protobuf.message.Message):
     @property
     def device_ui(self) -> meshtastic.protobuf.device_ui_pb2.DeviceUIConfig: ...
     @property
-    def destinations(self) -> meshtastic.protobuf.destinations_pb2.DestinationsConfig: ...
+    def destinations(self) -> global___Config.DestinationsConfig: ...
     def __init__(
         self,
         *,
@@ -1488,12 +2386,12 @@ class Config(google.protobuf.message.Message):
         power: global___Config.PowerConfig | None = ...,
         network: global___Config.NetworkConfig | None = ...,
         display: global___Config.DisplayConfig | None = ...,
-        lora: meshtastic.protobuf.lora_config_pb2.LoRaConfig | None = ...,
+        lora: global___Config.LoRaConfig | None = ...,
         bluetooth: global___Config.BluetoothConfig | None = ...,
         security: global___Config.SecurityConfig | None = ...,
         sessionkey: global___Config.SessionkeyConfig | None = ...,
         device_ui: meshtastic.protobuf.device_ui_pb2.DeviceUIConfig | None = ...,
-        destinations: meshtastic.protobuf.destinations_pb2.DestinationsConfig | None = ...,
+        destinations: global___Config.DestinationsConfig | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing.Literal["bluetooth", b"bluetooth", "destinations", b"destinations", "device", b"device", "device_ui", b"device_ui", "display", b"display", "lora", b"lora", "network", b"network", "payload_variant", b"payload_variant", "position", b"position", "power", b"power", "security", b"security", "sessionkey", b"sessionkey"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["bluetooth", b"bluetooth", "destinations", b"destinations", "device", b"device", "device_ui", b"device_ui", "display", b"display", "lora", b"lora", "network", b"network", "payload_variant", b"payload_variant", "position", b"position", "power", b"power", "security", b"security", "sessionkey", b"sessionkey"]) -> None: ...

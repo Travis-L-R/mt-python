@@ -7,7 +7,7 @@ import builtins
 import google.protobuf.descriptor
 import google.protobuf.message
 import meshtastic.protobuf.channel_pb2
-import meshtastic.protobuf.lora_config_pb2
+import meshtastic.protobuf.config_pb2
 import typing
 
 DESCRIPTOR: google.protobuf.descriptor.FileDescriptor
@@ -18,7 +18,7 @@ class MeshBeacon(google.protobuf.message.Message):
     Payload for MESH_BEACON_APP packets.
     Periodically broadcast by nodes in beacon mode.
     Listeners deliver the text message to the local inbox and cache any offered
-    channel/preset for the client app to act on — the firmware never auto-applies them.
+    channel/preset for the client app to act on - the firmware never auto-applies them.
     """
 
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
@@ -31,11 +31,11 @@ class MeshBeacon(google.protobuf.message.Message):
     """
     Human-readable beacon message. Max 100 bytes enforced by firmware on send.
     """
-    offer_region: meshtastic.protobuf.lora_config_pb2.LoRaConfig.RegionCode.ValueType
+    offer_region: meshtastic.protobuf.config_pb2.Config.LoRaConfig.RegionCode.ValueType
     """
     Optional region being advertised alongside offer_preset.
     """
-    offer_preset: meshtastic.protobuf.lora_config_pb2.LoRaConfig.ModemPreset.ValueType
+    offer_preset: meshtastic.protobuf.config_pb2.Config.LoRaConfig.ModemPreset.ValueType
     """
     Optional modem preset being advertised.
     Combined with offer_region, tells a client "there is a mesh on this preset/region".
@@ -52,8 +52,8 @@ class MeshBeacon(google.protobuf.message.Message):
         *,
         message: builtins.str = ...,
         offer_channel: meshtastic.protobuf.channel_pb2.ChannelSettings | None = ...,
-        offer_region: meshtastic.protobuf.lora_config_pb2.LoRaConfig.RegionCode.ValueType = ...,
-        offer_preset: meshtastic.protobuf.lora_config_pb2.LoRaConfig.ModemPreset.ValueType | None = ...,
+        offer_region: meshtastic.protobuf.config_pb2.Config.LoRaConfig.RegionCode.ValueType = ...,
+        offer_preset: meshtastic.protobuf.config_pb2.Config.LoRaConfig.ModemPreset.ValueType | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing.Literal["_offer_preset", b"_offer_preset", "offer_channel", b"offer_channel", "offer_preset", b"offer_preset"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["_offer_preset", b"_offer_preset", "message", b"message", "offer_channel", b"offer_channel", "offer_preset", b"offer_preset", "offer_region", b"offer_region"]) -> None: ...
